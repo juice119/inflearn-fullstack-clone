@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   postgres:
     image: postgres:latest
@@ -10,7 +9,7 @@ services:
       POSTGRES_PASSWORD: prismapass
       POSTGRES_DB: inflearn_clone
     volumes:
-      - inflearn_clone_db:/var/lib/postgresql/data
+      - inflearn_clone_db:/var/lib/postgresql
 
 volumes:
   inflearn_clone_db:
