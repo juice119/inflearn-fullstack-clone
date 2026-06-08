@@ -9,11 +9,11 @@ import { JWT } from "next-auth/jwt";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   jwt: {
     encode: async ({ token, secret }) => {
-      return jwt.sign(token as jwt.JwtPayload, secret as string)
+      return jwt.sign(token as jwt.JwtPayload, secret as string);
     },
     decode: async ({ token, secret }) => {
       return jwt.verify(token as string, secret as string) as JWT;
-    }
+    },
   },
   useSecureCookies: process.env.NODE_ENV === "production",
   trustHost: true,
