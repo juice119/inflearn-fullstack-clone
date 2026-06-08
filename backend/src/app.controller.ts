@@ -2,7 +2,8 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AccessTokenGuard } from './auth/guards/access-token.guards';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import type { Request } from 'express';
+import { User } from './common/decorators/user.decorator';
+import { JwtUserPayLoad } from './common/JwtUserPayLoad';
 
 @Controller()
 export class AppController {
@@ -16,8 +17,7 @@ export class AppController {
   @Get('user-test')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth('access-token')
-  testUser(@Req() req: Request) {
-    console.log(req.user);
-    return 'test completed';
+  testUser(@User() user: JwtUserPayLoad) {
+    return `유저 이메일 ${user.email}`;
   }
 }
