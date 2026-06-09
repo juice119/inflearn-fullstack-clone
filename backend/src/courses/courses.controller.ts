@@ -15,7 +15,6 @@ import { JwtUserPayLoad } from 'src/common/JwtUserPayLoad';
 import { CreateCourseDto } from './dto/CreateCourseDto';
 import { ApiQuery } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guards';
 import { UpdateCourseDto } from './dto/UpdateCourseDto';
 
 @Controller('courses')
