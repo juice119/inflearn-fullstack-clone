@@ -13,9 +13,10 @@ import { JwtAuth } from 'src/common/decorators/JwtAuth.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { JwtUserPayLoad } from 'src/common/JwtUserPayLoad';
 import { CreateCourseDto } from './dto/CreateCourseDto';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
 import { UpdateCourseDto } from './dto/UpdateCourseDto';
+import { PrismaModel } from 'src/_gen/prisma-class';
 
 @Controller('courses')
 export class CoursesController {
@@ -23,6 +24,10 @@ export class CoursesController {
 
   @Post()
   @JwtAuth()
+  @ApiOkResponse({
+    description: '생성된 강의',
+    type: PrismaModel.Course,
+  })
   create(
     @User() user: JwtUserPayLoad,
     @Body() createaCourseDto: CreateCourseDto,
@@ -36,6 +41,11 @@ export class CoursesController {
   @ApiQuery({ name: 'caretoryId', required: false })
   @ApiQuery({ name: 'skip', required: false })
   @ApiQuery({ name: 'take', required: false })
+  @ApiOkResponse({
+    description: '강의 목록',
+    type: PrismaModel.Course,
+    isArray: true,
+  })
   findAll(
     @Query('title') title?: string,
     @Query('level') level?: string,
@@ -73,6 +83,10 @@ export class CoursesController {
     required: false,
     description: 'sections,lectures,courseReviews 등 포함할 관계 지정',
   })
+  @ApiOkResponse({
+    description: '강의 정보',
+    type: PrismaModel.Course,
+  })
   findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @Query('include') include?: string,
@@ -83,6 +97,10 @@ export class CoursesController {
 
   @Patch(':id')
   @JwtAuth()
+  @ApiOkResponse({
+    description: '강의 제거',
+    type: PrismaModel.Course,
+  })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @User() user: JwtUserPayLoad,

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsArray,
-  IsBoolean,
   IsNumber,
   IsOptional,
   IsString,
@@ -55,9 +55,11 @@ export class CreateCourseDto {
   @ApiProperty({
     description: '강의 카테고리 ID 목록',
     example: ['9f586aad-07d5-47c6-92df-8e6f1a8bb974'],
+    type: [String],
   })
   @IsArray()
-  @IsUUID(undefined, { each: true })
+  @IsUUID('all', { each: true })
   @IsOptional()
-  categoryIds?: string[];
+  @Transform(({ value }) => value ?? [])
+  categoryIds: string[] = [];
 }

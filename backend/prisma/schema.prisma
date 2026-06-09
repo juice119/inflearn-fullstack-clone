@@ -2,6 +2,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator prismaClassGenerator {
+  provider               = "prisma-class-generator"
+  dryRun                 = "false"
+  separateRelationFields = "false"
+}
+
 datasource db {
   provider = "postgresql"
 }
