@@ -2,10 +2,13 @@ import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import { AppConfig } from 'src/common/config/AplicationConfig';
+
+const appConfig = AppConfig.ofYml(process.env.NODE_ENV || '');
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({
-    connectionString: process.env.DATABASE_URL as string,
+    connectionString: appConfig.database.url,
   }),
 });
 

@@ -1,5 +1,8 @@
 import 'dotenv/config';
 import { defineConfig } from 'prisma/config';
+import { AppConfig } from 'src/common/config/AplicationConfig';
+
+const appConfig = AppConfig.ofYml(process.env.NODE_ENV || '');
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -7,6 +10,6 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: process.env['DATABASE_URL'],
+    url: appConfig.database.url,
   },
 });
