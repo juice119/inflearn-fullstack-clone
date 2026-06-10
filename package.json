@@ -1,0 +1,16 @@
+{
+  "name": "inflearn-fullstack-clone",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "lint:staged": "lint-staged"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7"
+  },
+  "lint-staged": {
+    "backend/**/*.{ts,mjs}": "bash scripts/lint-staged-backend.sh"
+  }
+}

@@ -1,6 +1,21 @@
+### Dependencies
+node_modules/
 
-### VisualStudioCode ##.vscode/*
-.vscode/
+### pnpm
+.pnpm-store/
+
+### ESLint / Prettier
+.eslintcache
+
+### Husky (내부 생성 파일만 제외, .husky/pre-commit 등은 커밋)
+.husky/_/
+
+### VisualStudioCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # Local History for Visual Studio Code
 .history/
@@ -8,7 +23,7 @@
 # Built Visual Studio Code Extensions
 *.vsix
 
-### VisualStudioCode Patch ###
+### VisualStudioCode Patch
 # Ignore all local history of files
 .history
 .ionide
