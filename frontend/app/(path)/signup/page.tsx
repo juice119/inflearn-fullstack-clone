@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import { signUp } from "@/app/actions/auth-actions";
-import { Link } from "lucide-react";
-import { useState, type SubmitEvent } from "react";
+import { signUp } from '@/app/actions/auth-actions';
+import { Link } from 'lucide-react';
+import { useState, type SubmitEvent } from 'react';
 
 export default function SignupPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (password !== passwordConfirm) {
-      alert("비밀번호가 일치하지 않습니다.");
+      alert('비밀번호가 일치하지 않습니다.');
       return;
     }
 
     const result = await signUp({ email, password });
 
-    if (result?.status != "ok") {
-      alert(result?.message || "회원 가입 실패");
+    if (result?.status != 'ok') {
+      alert(result?.message || '회원 가입 실패');
       return;
     }
 
@@ -33,10 +33,7 @@ export default function SignupPage() {
       <h1 className="text-3xl font-bold">회원가입</h1>
       <p className="text-gray-700">인프런에서 다양한 학습의 기회를 얻으세요</p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-2 min-w-[300px]"
-      >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2 min-w-[300px]">
         <label htmlFor="email">이메일</label>
         <input
           value={email}

@@ -11,6 +11,7 @@
     "lint-staged": "^17.0.7"
   },
   "lint-staged": {
-    "backend/**/*.{ts,mjs}": "bash scripts/lint-staged-backend.sh"
+    "backend/**/*.{ts,mjs}": "bash scripts/lint-staged-backend.sh",
+    "frontend/**/*.{ts,tsx,mjs}": "bash scripts/lint-staged-frontend.sh"
   }
 }

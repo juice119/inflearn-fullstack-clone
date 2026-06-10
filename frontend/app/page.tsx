@@ -1,5 +1,5 @@
-import { auth, signOut } from "@/auth";
-import Link from "next/link";
+import { auth, signOut } from '@/auth';
+import Link from 'next/link';
 
 export default async function Home() {
   const session = await auth();
@@ -11,7 +11,7 @@ export default async function Home() {
       {session?.user ? (
         <form
           action={async () => {
-            "use server";
+            'use server';
             await signOut();
           }}
         >

@@ -1,15 +1,9 @@
-"use server";
+'use server';
 
-import { saltAndHashPassword } from "@/lib/password-utils";
-import { prisma } from "@/prisma";
+import { saltAndHashPassword } from '@/lib/password-utils';
+import { prisma } from '@/prisma';
 
-export async function signUp({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) {
+export async function signUp({ email, password }: { email: string; password: string }) {
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -18,7 +12,7 @@ export async function signUp({
     });
 
     if (existingUser) {
-      return { status: "error", message: "이미 존재하는 이메일입니다." };
+      return { status: 'error', message: '이미 존재하는 이메일입니다.' };
     }
 
     const user = await prisma.user.create({
@@ -28,8 +22,9 @@ export async function signUp({
       },
     });
 
-    if (user) return { status: "ok" };
-  } catch (error) {
-    return { status: "error", message: "회원가입에 실패하였습니다." };
+    if (user) return { status: 'ok' };
+  } catch (error: unknown) {
+    console.error(error);
+    return { status: 'error', message: '회원가입에 실패하였습니다.' };
   }
 }
