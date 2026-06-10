@@ -52,6 +52,7 @@ model User {
   image          String?
   bio            String?
 
+  createdSections   Section[]          @relation("CreatedSections")
   accounts          Account[]
   sessions          Session[]
   courses           Course[]
@@ -60,6 +61,7 @@ model User {
   courseQuestions   CourseQuestion[]
   courseComments    CourseComment[]
   lectureActivities LectureActivity[]
+  sections          Section[]
 
   @@map("users")
 }
@@ -100,17 +102,23 @@ model Course {
 }
 
 model Section {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  order       Int
-  courseId    String   @map("course_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id            String    @id @default(uuid())
+  title         String
+  description   String?
+  order         Int
+  createdUserId String    @map("create_user_id")
+  courseId      String    @map("course_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
 
-  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lectures Lecture[]
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lectures    Lecture[]
+  createdUser User      @relation("CreatedSections", fields: [createdUserId], references: [id])
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      String?
 
+  @@unique([courseId, order])
   @@map("sections")
 }
 
@@ -131,6 +139,7 @@ model Lecture {
   course     Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
   activities LectureActivity[]
 
+  @@unique([sectionId, order])
   @@map("lectures")
 }
 

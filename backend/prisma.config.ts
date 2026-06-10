@@ -1,8 +1,13 @@
-import 'dotenv/config';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import yaml from 'js-yaml';
 import { defineConfig } from 'prisma/config';
-import { AppConfig } from 'src/common/config/AplicationConfig';
 
-const appConfig = AppConfig.ofYml(process.env.NODE_ENV || '');
+const env = process.env.NODE_ENV || 'local';
+const configPath = join(process.cwd(), 'enviorment', `${env}-enviorment.yml`);
+const { database } = yaml.load(readFileSync(configPath, 'utf8')) as {
+  database: { url: string };
+};
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -10,6 +15,6 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: appConfig.database.url,
+    url: database.url,
   },
 });
