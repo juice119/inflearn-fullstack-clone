@@ -1,8 +1,8 @@
-import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
-import { v4 as uuidv4 } from 'uuid';
+import 'dotenv/config';
 import { AppConfig } from 'src/common/config/AplicationConfig';
+import { v4 as uuidv4 } from 'uuid';
 
 const appConfig = AppConfig.ofYml(process.env.NODE_ENV || '');
 

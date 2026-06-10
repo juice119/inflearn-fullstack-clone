@@ -1,6 +1,7 @@
+import { plainToInstance } from 'class-transformer';
+import { validateSync } from 'class-validator';
 import { readFileSync } from 'fs';
 import yaml from 'js-yaml';
-import { join } from 'path';
 import 'reflect-metadata';
 import { AppConfig } from './AplicationConfig';
 
@@ -15,106 +16,117 @@ vi.mock('js-yaml', () => ({
 }));
 
 describe('AppConfig', () => {
-  const validConfig = {
-    database: { url: 'postgresql://prisma:prismapass@localhost:5432/inflearn_clone?schema=public' },
-    jwt: { authSecret: 'asd' },
-    server: { port: 8000 },
-  };
-
-  beforeEach(() => {
-    vi.mocked(readFileSync).mockReturnValue('mocked-yaml-content');
-    vi.mocked(yaml.load).mockReturnValue(validConfig);
-  });
+  beforeEach(() => {});
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe('ofYml', () => {
-    describe('given 유효한 yml 설정', () => {
-      describe('when env를 지정하지 않으면', () => {
-        it('then local-enviorment.yml을 읽고 검증된 AppConfig를 반환한다', () => {
-          const config = AppConfig.ofYml();
+    it('yaml파일을 읽어서 직렬화한다.', () => {
+      // gievn
+      const validConfig = createValdateConfigObject();
+      vi.mocked(readFileSync).mockReturnValue('mocked-yaml-content');
+      vi.mocked(yaml.load).mockReturnValue(validConfig);
 
-          expect(readFileSync).toHaveBeenCalledWith(
-            join(process.cwd(), 'enviorment', 'local-enviorment.yml'),
-            'utf8',
-          );
-          expect(yaml.load).toHaveBeenCalledWith('mocked-yaml-content');
-          expect(config).toBeInstanceOf(AppConfig);
-          expect(config.database.url).toBe(validConfig.database.url);
-          expect(config.jwt.authSecret).toBe(validConfig.jwt.authSecret);
-          expect(config.server.port).toBe(validConfig.server.port);
-        });
-      });
+      // when
+      const config = AppConfig.ofYml();
 
-      describe('when env를 production으로 지정하면', () => {
-        it('then production-enviorment.yml 경로를 사용한다', () => {
-          AppConfig.ofYml('production');
+      // then
+      expect(config).instanceOf(AppConfig);
+      expect(config).toEqual(validConfig);
+    });
 
-          expect(readFileSync).toHaveBeenCalledWith(
-            join(process.cwd(), 'enviorment', 'production-enviorment.yml'),
-            'utf8',
-          );
-        });
+    it('잘못된 데이터가 있는 경우 에러가 발생한다.', () => {
+      // gievn
+      const unValidatedConfig = {
+        database: {
+          url: undefined,
+        },
+        jwt: { authSecret: true },
+        server: { port: 'test' },
+      };
+      vi.mocked(readFileSync).mockReturnValue('mocked-yaml-content');
+      vi.mocked(yaml.load).mockReturnValue(unValidatedConfig);
+
+      // when
+      const fn = () => AppConfig.ofYml();
+
+      // then
+      expect(fn).toThrowErrorMatchingInlineSnapshot(`
+        [Error: ❌ 설정 파일 검증 실패:
+        An instance of AppConfig has failed the validation:
+         - property database.url has failed the following constraints: isString 
+        ,An instance of AppConfig has failed the validation:
+         - property server.port has failed the following constraints: isNumber, max, min 
+        ]
+      `);
+    });
+  });
+
+  describe('AppConfig 데이터 검증', () => {
+    describe('database', () => {
+      it('url이 비어있으면 에러가 발생한다.', () => {
+        // gievn
+        const config = plainToInstance(AppConfig, createValdateConfigObject());
+        const unValdatedData = 123;
+        config.database.url = unValdatedData as unknown as string;
+
+        // when
+        const errors = validateSync(config);
+
+        // then
+        expect(errors).toHaveLength(1);
+        expect(errors[0].children?.[0].property).toBe('url');
+        expect(errors[0].children?.[0].value).toBe(unValdatedData);
+        expect(errors[0].children?.[0].constraints).toHaveProperty('isString');
       });
     });
 
-    describe('given 유효하지 않은 yml 설정', () => {
-      describe('when server.port가 1 미만이면', () => {
-        it('then 검증 오류를 던진다', () => {
-          vi.mocked(yaml.load).mockReturnValue({
-            ...validConfig,
-            server: { port: 0 },
-          });
+    describe('jwt', () => {
+      it('authSecret이 문자열이 아니면 에러가 발생한다.', () => {
+        // gievn
+        const config = plainToInstance(AppConfig, createValdateConfigObject());
+        const unValdatedData = 123;
+        config.jwt.authSecret = unValdatedData as unknown as string;
 
-          expect(() => AppConfig.ofYml()).toThrow('❌ 설정 파일 검증 실패');
-        });
+        // when
+        const errors = validateSync(config);
+
+        // then
+        expect(errors).toHaveLength(1);
+        expect(errors[0].children?.[0].property).toBe('authSecret');
+        expect(errors[0].children?.[0].value).toBe(unValdatedData);
+        expect(errors[0].children?.[0].constraints).toHaveProperty('isString');
       });
+    });
 
-      describe('when server.port가 9999를 초과하면', () => {
-        it('then 검증 오류를 던진다', () => {
-          vi.mocked(yaml.load).mockReturnValue({
-            ...validConfig,
-            server: { port: 10000 },
-          });
+    describe('server', () => {
+      it('port가 숫자가 아니면 에러가 발생한다.', () => {
+        // gievn
+        const config = plainToInstance(AppConfig, createValdateConfigObject());
+        const unValdatedData = 'test';
+        config.server.port = unValdatedData as unknown as number;
 
-          expect(() => AppConfig.ofYml()).toThrow('❌ 설정 파일 검증 실패');
-        });
-      });
+        // when
+        const errors = validateSync(config);
 
-      describe('when server.port가 누락되면', () => {
-        it('then 검증 오류를 던진다', () => {
-          vi.mocked(yaml.load).mockReturnValue({
-            ...validConfig,
-            server: {},
-          });
-
-          expect(() => AppConfig.ofYml()).toThrow('❌ 설정 파일 검증 실패');
-        });
-      });
-
-      describe('when jwt.authSecret이 누락되면', () => {
-        it('then 검증 오류를 던진다', () => {
-          vi.mocked(yaml.load).mockReturnValue({
-            ...validConfig,
-            jwt: {},
-          });
-
-          expect(() => AppConfig.ofYml()).toThrow('❌ 설정 파일 검증 실패');
-        });
-      });
-
-      describe('when database.url이 누락되면', () => {
-        it('then 검증 오류를 던진다', () => {
-          vi.mocked(yaml.load).mockReturnValue({
-            ...validConfig,
-            database: {},
-          });
-
-          expect(() => AppConfig.ofYml()).toThrow('❌ 설정 파일 검증 실패');
-        });
+        // then
+        expect(errors).toHaveLength(1);
+        expect(errors[0].children?.[0].property).toBe('port');
+        expect(errors[0].children?.[0].value).toBe(unValdatedData);
+        expect(errors[0].children?.[0].constraints).toHaveProperty('isNumber');
       });
     });
   });
 });
+
+function createValdateConfigObject(): Required<AppConfig> {
+  return {
+    database: {
+      url: 'postgresql://prisma:prismapass@localhost:5432/inflearn_clone?schema=public',
+    },
+    jwt: { authSecret: 'sd' },
+    server: { port: 8000 },
+  };
+}
