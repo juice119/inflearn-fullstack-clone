@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateSectionDto } from './dto/CreateSection.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateSectionDto } from './dto/UpdateSection.dto';
@@ -11,11 +7,7 @@ import { UpdateSectionDto } from './dto/UpdateSection.dto';
 export class SectionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    courseId: string,
-    userId: string,
-    createSectionDto: CreateSectionDto,
-  ) {
+  async create(courseId: string, userId: string, createSectionDto: CreateSectionDto) {
     const course = await this.prisma.course.findUnique({
       where: {
         id: courseId,
@@ -23,14 +15,10 @@ export class SectionsService {
     });
 
     if (!course)
-      throw new NotFoundException(
-        `섹션을 만들 강의가 존재하지 않습니다.courseId: ${courseId}`,
-      );
+      throw new NotFoundException(`섹션을 만들 강의가 존재하지 않습니다.courseId: ${courseId}`);
 
     if (course.instructorId !== userId)
-      throw new UnauthorizedException(
-        `섹션을 만들 수 있는 권한이 없습니다. courseId: ${courseId}`,
-      );
+      throw new UnauthorizedException(`섹션을 만들 수 있는 권한이 없습니다. courseId: ${courseId}`);
 
     const lastOrderSection = await this.prisma.section.findFirst({
       where: {
@@ -74,17 +62,10 @@ export class SectionsService {
     });
   }
 
-  async update(
-    sectionId: string,
-    userId: string,
-    updateSectionDto: UpdateSectionDto,
-  ) {
+  async update(sectionId: string, userId: string, updateSectionDto: UpdateSectionDto) {
     const section = await this.findActiveSection(sectionId);
 
-    if (!section)
-      throw new NotFoundException(
-        `섹션을 찾을 수 없습니다. sectionId: ${sectionId}`,
-      );
+    if (!section) throw new NotFoundException(`섹션을 찾을 수 없습니다. sectionId: ${sectionId}`);
 
     if (section.createdUserId !== userId)
       throw new UnauthorizedException(
@@ -106,10 +87,7 @@ export class SectionsService {
   async delete(sectionId: string, userId: string) {
     const section = await this.findActiveSection(sectionId);
 
-    if (!section)
-      throw new NotFoundException(
-        `섹션을 찾을 수 없습니다. sectionId: ${sectionId}`,
-      );
+    if (!section) throw new NotFoundException(`섹션을 찾을 수 없습니다. sectionId: ${sectionId}`);
 
     if (section.createdUserId !== userId)
       throw new UnauthorizedException(

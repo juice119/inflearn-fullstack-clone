@@ -1,12 +1,5 @@
 import { plainToInstance, Type } from 'class-transformer';
-import {
-  IsNumber,
-  IsString,
-  Max,
-  Min,
-  ValidateNested,
-  validateSync,
-} from 'class-validator';
+import { IsNumber, IsString, Max, Min, ValidateNested, validateSync } from 'class-validator';
 import { readFileSync } from 'fs';
 import yaml from 'js-yaml';
 import { join } from 'path';
@@ -42,11 +35,7 @@ export class AppConfig {
   server: Server;
 
   static ofYml(env: string = 'local'): AppConfig {
-    const configPath = join(
-      process.cwd(),
-      'enviorment',
-      `${env}-enviorment.yml`,
-    );
+    const configPath = join(process.cwd(), 'enviorment', `${env}-enviorment.yml`);
 
     const configObject = yaml.load(readFileSync(configPath, 'utf8'));
 

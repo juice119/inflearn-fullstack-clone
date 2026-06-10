@@ -9,7 +9,14 @@ import { LecturesModule } from './lectures/lectures.module';
 import { SectionsModule } from './sections/sections.module';
 
 @Module({
-  imports: [AppConfigModule, AuthModule, PrismaModule, CoursesModule, LecturesModule, SectionsModule],
+  imports: [
+    AppConfigModule,
+    AuthModule,
+    PrismaModule,
+    CoursesModule,
+    LecturesModule,
+    SectionsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

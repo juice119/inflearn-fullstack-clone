@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
 import { SectionsService } from './sections.service';
 import { PrismaModel } from 'src/_gen/prisma-class';
 import { ApiOkResponse, ApiParam } from '@nestjs/swagger';
@@ -72,10 +63,7 @@ export class SectionsController {
     description: '섹션 삭제',
     type: PrismaModel.Section,
   })
-  delete(
-    @Param('sectionId', ParseUUIDPipe) sectionId: string,
-    @User() user: JwtUserPayLoad,
-  ) {
+  delete(@Param('sectionId', ParseUUIDPipe) sectionId: string, @User() user: JwtUserPayLoad) {
     return this.sectionsService.delete(sectionId, user.id);
   }
 }

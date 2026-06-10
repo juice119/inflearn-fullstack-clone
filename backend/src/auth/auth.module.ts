@@ -5,6 +5,6 @@ import { AccessTokenStrategy } from './strategied/access-token.strategy';
 
 @Module({
   imports: [PassportModule, JwtModule.register({})],
-  providers: [AccessTokenStrategy]
+  providers: [AccessTokenStrategy],
 })
 export class AuthModule {}

@@ -124,7 +124,7 @@ importers:
         specifier: ^30.0.0
         version: 30.4.2(@types/node@24.12.4)(ts-node@10.9.2(@types/node@24.12.4)(typescript@5.9.3))
       prettier:
-        specifier: ^3.4.2
+        specifier: ^3.8.3
         version: 3.8.3
       prisma:
         specifier: ^7.8.0

@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { JwtAuth } from 'src/common/decorators/JwtAuth.decorator';
 import { User } from 'src/common/decorators/user.decorator';
@@ -28,10 +19,7 @@ export class CoursesController {
     description: '생성된 강의',
     type: PrismaModel.Course,
   })
-  create(
-    @User() user: JwtUserPayLoad,
-    @Body() createaCourseDto: CreateCourseDto,
-  ) {
+  create(@User() user: JwtUserPayLoad, @Body() createaCourseDto: CreateCourseDto) {
     return this.coursesService.create(user.id, createaCourseDto);
   }
 
@@ -87,10 +75,7 @@ export class CoursesController {
     description: '강의 정보',
     type: PrismaModel.Course,
   })
-  findOne(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Query('include') include?: string,
-  ) {
+  findOne(@Param('id', ParseUUIDPipe) id: string, @Query('include') include?: string) {
     const includeArray = include ? include.split(',') : undefined;
     return this.coursesService.findOne(id, includeArray);
   }

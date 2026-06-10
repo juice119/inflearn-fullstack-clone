@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCourseDto } from './dto/CreateCourseDto';
 import { Course, Prisma } from '@prisma/client';
@@ -13,10 +9,7 @@ import slug from 'slug';
 export class CoursesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(
-    userId: string,
-    createCourseDto: CreateCourseDto,
-  ): Promise<Course> {
+  async create(userId: string, createCourseDto: CreateCourseDto): Promise<Course> {
     return this.prisma.course.create({
       data: {
         title: createCourseDto.title,
