@@ -1,0 +1,52 @@
+---
+alwaysApply: true
+---
+
+Strictly enforce the following testing architecture and conventions. No exceptions.
+
+## 1. Directory & Naming (Strict Isolation)
+
+- **Zero Tests in `src/`**: All test files must reside strictly within the `test/` directory.
+- **Mirror `src/` Structure**: Under each test layer, replicate the `src/` subdirectory path. Map the source file path directly to the test path by swapping the layer prefix for `src/`.
+  - `src/common/config/AplicationConfig.ts` -> `test/unit/common/config/AplicationConfig.spec.ts`
+  - `src/lecture/lecture.service.ts` -> `test/integration/lecture/lecture.service.spec.ts`
+- **Unified Suffix**: Always use `*.spec.ts`. Do NOT use `.unit.spec.ts` or `.int.spec.ts`.
+- **Location-Based Type**: Testing layers are defined solely by their physical directory:
+  - `test/unit/` -> Unit Tests (Domain, Entities, Pure functions)
+  - `test/integration/` -> Integration Tests (Services, Modules, DB Container required)
+  - `test/e2e/` -> E2E Tests (Endpoints, Guards, Playwright)
+
+## 2. Test Layer Boundaries (Zero-Duplication)
+
+- **Unit**: Strictly NO DB. Focus on pure business logic, algorithms, and state transitions. Minimize mocking.
+- **Integration**: Requires local Docker DB. Validate all business scenarios, edge cases, and transaction failures at the Service layer (100% edge case coverage).
+- **E2E**: Requires full app bootstrap + DB. Test Happy Path and Global Gatekeepers (JWT Guards, DTO Validations) only. Do not duplicate service edge cases.
+
+## 3. Code Style & Conventions
+
+- **Language**: All `describe` and `it` block text MUST be written in **Korean**.
+- **AAA Pattern**: Explicitly structure every test case with `// given`, `// when`, and `// then` comments.
+- **Sanitization**: Always call `vi.clearAllMocks();` inside the `afterEach` hook to prevent test pollution.
+
+## 4. Blueprint Template
+
+```typescript
+describe("TargetClass", () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("methodName", () => {
+    it("조건에 맞는 명확한 한글 설명 기재", () => {
+      // given
+      const sampleData = { id: 1 };
+
+      // when
+      const result = TargetClass.methodName(sampleData);
+
+      // then
+      expect(result).toBeDefined();
+    });
+  });
+});
+```

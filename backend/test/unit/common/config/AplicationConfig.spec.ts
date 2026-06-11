@@ -3,7 +3,7 @@ import { validateSync } from 'class-validator';
 import { readFileSync } from 'fs';
 import yaml from 'js-yaml';
 import 'reflect-metadata';
-import { AppConfig } from './AplicationConfig';
+import { AppConfig } from '../../../../src/common/config/AplicationConfig';
 
 vi.mock('fs', () => ({
   readFileSync: vi.fn(),
@@ -16,15 +16,13 @@ vi.mock('js-yaml', () => ({
 }));
 
 describe('AppConfig', () => {
-  beforeEach(() => {});
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe('ofYml', () => {
-    it('yaml파일을 읽어서 직렬화한다.', () => {
-      // gievn
+    it('yaml 파일을 읽어서 직렬화한다.', () => {
+      // given
       const validConfig = createValdateConfigObject();
       vi.mocked(readFileSync).mockReturnValue('mocked-yaml-content');
       vi.mocked(yaml.load).mockReturnValue(validConfig);
@@ -38,7 +36,7 @@ describe('AppConfig', () => {
     });
 
     it('잘못된 데이터가 있는 경우 에러가 발생한다.', () => {
-      // gievn
+      // given
       const unValidatedConfig = {
         database: {
           url: undefined,
@@ -64,10 +62,10 @@ describe('AppConfig', () => {
     });
   });
 
-  describe('AppConfig 데이터 검증', () => {
+  describe('validateSync', () => {
     describe('database', () => {
-      it('url이 비어있으면 에러가 발생한다.', () => {
-        // gievn
+      it('url이 문자열이 아니면 에러가 발생한다.', () => {
+        // given
         const config = plainToInstance(AppConfig, createValdateConfigObject());
         const unValdatedData = 123;
         config.database.url = unValdatedData as unknown as string;
@@ -85,7 +83,7 @@ describe('AppConfig', () => {
 
     describe('jwt', () => {
       it('authSecret이 문자열이 아니면 에러가 발생한다.', () => {
-        // gievn
+        // given
         const config = plainToInstance(AppConfig, createValdateConfigObject());
         const unValdatedData = 123;
         config.jwt.authSecret = unValdatedData as unknown as string;
@@ -103,7 +101,7 @@ describe('AppConfig', () => {
 
     describe('server', () => {
       it('port가 숫자가 아니면 에러가 발생한다.', () => {
-        // gievn
+        // given
         const config = plainToInstance(AppConfig, createValdateConfigObject());
         const unValdatedData = 'test';
         config.server.port = unValdatedData as unknown as number;
