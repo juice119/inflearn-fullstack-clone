@@ -58,3 +58,9 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 generated/
 
 src/_gen/
+
+# 🎭 Playwright Artifacts
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

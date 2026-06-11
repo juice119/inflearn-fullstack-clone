@@ -14,16 +14,20 @@ fail() {
     exit 1
 }
 
-echo -e "${GREEN}🚀 통합 테스트 환경 검증 및 인프라 초기화를 시작합니다.${NC}"
+echo -e "${GREEN}🚀 통합 테스트 환경 초기화를 시작합니다.${NC}"
 
-# ---------------------------------------------------------
-# [검증 1] Docker 데몬(엔진) 자체가 켜져 있는지 확인
-# ---------------------------------------------------------
+
 echo "🔍 [검증] Docker 데몬 실행 상태 확인 중..."
 if ! docker info > /dev/null 2>&1; then
     fail "Docker 데몬이 꺼져 있습니다. Docker Desktop 앱을 실행해 주세요."
 fi
 echo -e "${GREEN}✅ Docker 데몬 실행 확인.${NC}"
+
+
+if docker ps --filter "name=${CONTAINER_NAME}" --filter "status=running" | grep -q "${CONTAINER_NAME}"; then
+    echo -e "${GREEN}🏎️ 컨테이너가 이미 구동 중 입니다. 초기화단계를 스킵합니다. ${NC}"
+    exit 0
+fi
 
 
 # ---------------------------------------------------------
@@ -49,14 +53,21 @@ if ! docker ps --filter "name=${CONTAINER_NAME}" --filter "status=running" | gre
 fi
 echo -e "${GREEN}✅ 컨테이너 정상 구동 확인 (Running).${NC}"
 
-# DB 내부 엔진 부팅 안정성을 위해 추가 대기
-echo "⏳ 데이터베이스 내부 엔진의 완전히 부팅될 때까지 대기합니다 (2초)..."
-sleep 2
 
+echo "⏳ PostgreSQL 준비 상태 확인 중..."
+for attempt in $(seq 1 30); do
+    if docker exec "${CONTAINER_NAME}" pg_isready -U prisma > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ PostgreSQL 준비 완료.${NC}"
+        break
+    fi
 
-# ---------------------------------------------------------
-# [3단계] Prisma Schema Push (가장 에러가 많이 나는 구간)
-# ---------------------------------------------------------
+    if [ "${attempt}" -eq 30 ]; then
+        fail "PostgreSQL이 30초 내에 준비되지 않았습니다."
+    fi
+
+    sleep 1
+done
+
 echo -e "\n🔄 [3단계] Prisma 스키마 푸시 (인프라 동기화)..."
 
 # 실행 전 팁: 앞에서 발생한 yml 파일 경로 오타가 고쳐졌는지 확인 필요합니다.

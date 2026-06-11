@@ -1,5 +1,5 @@
 import { plainToInstance, Type } from 'class-transformer';
-import { IsNumber, IsString, Max, Min, ValidateNested, validateSync } from 'class-validator';
+import { IsIn, IsNumber, IsString, Max, Min, ValidateNested, validateSync } from 'class-validator';
 import { readFileSync } from 'fs';
 import yaml from 'js-yaml';
 import { join } from 'path';
@@ -34,10 +34,15 @@ export class AppConfig {
   @ValidateNested()
   server: Server;
 
-  static ofYml(env: string = 'local'): AppConfig {
-    const configPath = join(process.cwd(), 'enviorment', `${env}-enviorment.yml`);
+  @IsString()
+  @IsIn(['local', 'development', 'production', 'test'])
+  enviroment: string;
 
-    const configObject = yaml.load(readFileSync(configPath, 'utf8'));
+  static ofYml(enviroment: string = 'local'): AppConfig {
+    const configPath = join(process.cwd(), 'enviorment', `${enviroment}-enviorment.yml`);
+
+    const configObject = yaml.load(readFileSync(configPath, 'utf8')) as Record<string, unknown>;
+    configObject['enviroment'] = enviroment;
 
     const validatedConfig = plainToInstance(AppConfig, configObject, {
       enableImplicitConversion: true,
@@ -49,5 +54,17 @@ export class AppConfig {
     }
 
     return validatedConfig;
+  }
+
+  get isTest(): boolean {
+    return this.enviroment === 'test';
+  }
+
+  get listenPort(): number {
+    if (this.isTest && process.env.PORT) {
+      return Number(process.env.PORT);
+    }
+
+    return this.server.port;
   }
 }

@@ -32,7 +32,7 @@ describe('AppConfig', () => {
 
       // then
       expect(config).instanceOf(AppConfig);
-      expect(config).toEqual(validConfig);
+      expect(config).toEqual({ ...validConfig, enviroment: 'local' });
     });
 
     it('잘못된 데이터가 있는 경우 에러가 발생한다.', () => {
@@ -117,6 +117,39 @@ describe('AppConfig', () => {
       });
     });
   });
+
+  describe('listenPort', () => {
+    afterEach(() => {
+      delete process.env.PORT;
+    });
+
+    it('test 환경에서 PORT 환경변수가 있으면 해당 포트를 반환한다.', () => {
+      // given
+      const config = plainToInstance(AppConfig, {
+        ...createValdateConfigObject(),
+        enviroment: 'test',
+      });
+      process.env.PORT = '3101';
+
+      // when
+      const port = config.listenPort;
+
+      // then
+      expect(port).toBe(3101);
+    });
+
+    it('test 환경이 아니면 yml server.port를 반환한다.', () => {
+      // given
+      const config = plainToInstance(AppConfig, createValdateConfigObject());
+      process.env.PORT = '3101';
+
+      // when
+      const port = config.listenPort;
+
+      // then
+      expect(port).toBe(8000);
+    });
+  });
 });
 
 function createValdateConfigObject(): Required<AppConfig> {
@@ -126,5 +159,6 @@ function createValdateConfigObject(): Required<AppConfig> {
     },
     jwt: { authSecret: 'sd' },
     server: { port: 8000 },
+    enviroment: 'local',
   };
 }

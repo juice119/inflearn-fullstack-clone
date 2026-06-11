@@ -109,3 +109,22 @@ pnpm test:int-setup
 
 pnpm test:int
 ```
+
+### E2E
+
+Playwright가 테스트 실행 시 Docker DB 구동 → NestJS 서버 기동을 자동으로 수행합니다.
+
+```sh
+# E2E 테스트 (인프라 + 서버 자동 기동)
+pnpm test:e2e
+
+# Playwright UI 모드
+pnpm test:e2e-ui
+```
+
+인프라를 미리 준비해 두고 E2E만 반복 실행하려면:
+
+```sh
+pnpm test:e2e-setup
+SKIP_TEST_INFRA_SETUP=1 pnpm test:e2e
+```

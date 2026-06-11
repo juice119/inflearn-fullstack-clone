@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 import { AppConfig } from './common/config/AplicationConfig';
 
 async function bootstrap() {
@@ -17,7 +17,7 @@ async function bootstrap() {
         scheme: 'bearer',
         bearerFormat: 'JWT',
         name: 'access-token',
-        description: 'Enter access token',
+        description: 'jwt 토큰 입력',
         in: 'header',
       },
       'access-token',
@@ -27,6 +27,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(appConfig.server.port);
+  await app.listen(appConfig.listenPort);
+  console.log(`🚀 애플리케이션 서버가 구동 되었습니다 PORT: ${appConfig.listenPort}`);
 }
-bootstrap();
+void bootstrap();
