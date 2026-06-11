@@ -92,3 +92,20 @@ describe('AppConfig', () => {
   });
 });
 ```
+
+## 5. 테스트 실행 방법
+
+### unit
+
+```sh
+pnpm test:unit
+```
+
+### integration
+
+```sh
+# docker 및 외부 의존성을 위한 스크립트 !부팅후 한번만 실행하기
+pnpm test:int-setup
+
+pnpm test:int
+```
