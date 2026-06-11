@@ -1,15 +1,4 @@
----
-alwaysApply: true
----
-
-Enforce strict adherence to Conventional Commits specifications based on the configuration below.
-
-<rules>
-- **Spec**: Conventional Commits standard.
-- **Output Language**: The `<description>` and `[body]` MUST be written EXCLUSIVELY in Korean.
-- **Termination Rule**: `<description>` MUST end with a noun-phrase termination ONLY (e.g., ~구현, ~수정, ~추가, ~제거, ~개선). 
-- **Prohibited Verbs**: NEVER use past tense or sentence-ending verbs (❌ ~했음, ~함, ~했습니다, ~완료).
-</rules>
+When Cursor auto-generates a Git commit message for this repository (Source Control sparkle button), you MUST follow these rules strictly.
 
 <format>
 <type>(<scope>): <description>
@@ -17,11 +6,18 @@ Enforce strict adherence to Conventional Commits specifications based on the con
 [optional body explaining WHY, not how]
 </format>
 
+<rules>
+- **Spec**: Conventional Commits standard.
+- **Output Language**: The `<description>` and `[body]` MUST be written EXCLUSIVELY in Korean.
+- **Termination Rule**: `<description>` MUST end with a noun-phrase termination ONLY (e.g., ~구현, ~수정, ~추가, ~제거, ~개선).
+- **Prohibited Verbs**: NEVER use past tense or sentence-ending verbs (❌ ~했음, ~함, ~했습니다, ~완료).
+</rules>
+
 <constraints>
 - **Length**: Subject line (first line) MUST be less than or equal to 50 characters.
 - **Spacing**: Exactly one space after the colon (e.g., `feat: 메시지`).
 - **No Period**: NEVER end the subject line with a period (`.`).
-- **Monorepo Scope**: Every commit MUST specify a precise package/domain as the `<scope>` (e.g., `backend`, `frontend`, `auth`, `root`, `lecture`). Broad or vague scopes are strictly prohibited.
+- **Monorepo Scope**: Every commit MUST specify a precise package/domain as the `<scope>` (e.g., `backend`, `frontend`, `auth`, `root`, `lecture`, `courses`). Broad or vague scopes are strictly prohibited.
 </constraints>
 
 <types>
@@ -41,6 +37,6 @@ feat(backend): JWT 기반 액세스 토큰 발급 기능 구현
 fix(frontend): 모바일 뷰 결제 버튼 미정렬 오류 수정
 docs(root): README 문서에 테스트 전략 가이드라인 추가
 refactor(auth): 중복 회원 검증 로직을 커스텀 가드로 분리
-test(lecture): 강의 수정 기능 통합 테스트 코드 추가
+test(courses): 강의 생성 통합 테스트 코드 추가
 chore(root): pnpm 워크스페이스 패키지 의존성 최적화
 </examples>

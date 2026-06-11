@@ -37,7 +37,7 @@
 | **테스트 대상** | 엔티티 규칙, 순수 비즈니스 도메인 로직     | 서비스 레이어 (`*.service.ts`)                                             | 전체 애플리케이션 및 API 엔드포인트                                          |
 | **의존성 (DB)** | 불필요 (Mocking을 최소화한 순수 함수 검증) | **필수 (Docker 로컬 컨테이너 DB)**                                         | **필수 (Docker DB + 서버 전체 구동)**                                        |
 | **검증 범위**   | 알고리즘, 유효성 검사 규칙                 | **비즈니스 시나리오의 모든 엣지 케이스** (성공/실패/예외 케이스 100% 검증) | **핵심 사용자 흐름 (Happy Path)** 인증 가드, 라우팅, DTO 검증 등 문지기 역할 |
-| **사용 도구**   | Vitest                                     | Vitest                                                                     | Playwright (API Testing Client)                                              |
+| **사용 도구**   | Vitest                                     | Vitest + docker                                                            | Playwright (API Testing Client)                                              |
 
 ---
 
