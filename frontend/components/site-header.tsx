@@ -1,22 +1,22 @@
 'use client';
 
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CourseCategory } from '@/generated/openapi.ts';
 import { Layers, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Avatar, AvatarFallback } from './ui/avatar';
-import { Button } from './ui/button';
 
 export default function SiteHeader({ categories }: { categories: CourseCategory[] }) {
   const pathname = usePathname();
-  const isCategoryNeeded = pathname == '/' || pathname.includes('/category/');
+  const isCategoryNeeded = pathname == '/' || pathname.includes('/courses');
 
   return (
     <header className="site-header w-full border-b bg-white">
       {/* 상단 헤더 */}
-      <div className="header-top flex items-center justify-between px-8 py-3 ">
+      <div className="header-top flex items-center justify-between px-8 py-3 gap-4">
         {/* 로고 */}
         <div className="logo min-w-[120px]">
           <Link href="/">
@@ -65,7 +65,7 @@ export default function SiteHeader({ categories }: { categories: CourseCategory[
         <Link href="/instructor">
           <Button
             variant="outline"
-            className="font-semibold border-gray-200 hover:border-[#1dc078]"
+            className="font-semibold border-gray-200 hover:border-[#1dc078] hover:text-[#1dc078]"
           >
             지식공유자
           </Button>
@@ -84,7 +84,7 @@ export default function SiteHeader({ categories }: { categories: CourseCategory[
         {isCategoryNeeded && (
           <nav className="category-nav flex gap-6 py-4 overflow-x-auto scrollbar-none">
             {categories.map((category) => (
-              <Link key={category.id} href={`/category/${category.slug}`}>
+              <Link key={category.id} href={`/courses/${category.slug}`}>
                 <div className="category-item flex flex-col items-center min-w-[72px] text-gray-700 hover:text-[#1dc078] cursor-pointer transition-colors">
                   <Layers size={28} className="mb-1" />
                   <span className="text-xs font-medium whitespace-nowrap">{category.name}</span>
