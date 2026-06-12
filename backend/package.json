@@ -24,7 +24,7 @@
     "db:push": "prisma db push",
     "db:show": "prisma studio",
     "db:gen": "prisma generate",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "NODE_ENV=local ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

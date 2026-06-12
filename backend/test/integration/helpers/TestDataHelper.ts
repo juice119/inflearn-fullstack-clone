@@ -1,6 +1,6 @@
 import { fakerKO as faker } from '@faker-js/faker';
 import { TestingModule } from '@nestjs/testing';
-import { Course, Lecture, Section, User } from '@prisma/client';
+import { Course, CourseCategory, Lecture, Section, User } from '@prisma/client';
 import { hashSync } from 'bcryptjs';
 import { CoursesService } from 'src/courses/courses.service';
 import { CreateCourseDto } from 'src/courses/dto/CreateCourseDto';
@@ -10,7 +10,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSectionDto } from 'src/sections/dto/CreateSection.dto';
 import { SectionsService } from 'src/sections/sections.service';
 
-export class LectureTestDataHelper {
+export class TestDataHelper {
   private prisma: PrismaService;
   private module: TestingModule;
 
@@ -54,6 +54,16 @@ export class LectureTestDataHelper {
     return this.module
       .get(LecturesService)
       .create(section.courseId, section.id, user.id, createLectureDto);
+  }
+
+  createCategory(): Promise<CourseCategory> {
+    return this.prisma.courseCategory.create({
+      data: {
+        name: faker.word.noun(),
+        slug: faker.word.noun(),
+        description: faker.commerce.productDescription(),
+      },
+    });
   }
 
   buildCreateLectureDto(): CreateLectureDto {

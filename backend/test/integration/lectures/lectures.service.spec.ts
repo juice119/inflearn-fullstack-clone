@@ -3,11 +3,11 @@ import { CoursesService } from 'src/courses/courses.service';
 import { LecturesService } from 'src/lectures/lectures.service';
 import { SectionsService } from 'src/sections/sections.service';
 import { AppTestHepler } from '../helpers/AppTestHepler';
-import { LectureTestDataHelper } from '../helpers/LectureTestDataHelper';
+import { TestDataHelper } from '../helpers/TestDataHelper';
 
 describe('LecturesService', () => {
   let appTestHelper: AppTestHepler;
-  let testDataHelper: LectureTestDataHelper;
+  let testDataHelper: TestDataHelper;
   let lectureService: LecturesService;
 
   beforeAll(async () => {
@@ -20,7 +20,7 @@ describe('LecturesService', () => {
       })
       .compile();
 
-    testDataHelper = new LectureTestDataHelper(module);
+    testDataHelper = new TestDataHelper(module);
     lectureService = module.get(LecturesService);
   });
 

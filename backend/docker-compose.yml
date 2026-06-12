@@ -1,7 +1,9 @@
+name: inflearn-clone-local
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:17.1-alpine
     container_name: inflearn-clone-db
+    restart: always
     ports:
       - '5432:5432'
     environment:
