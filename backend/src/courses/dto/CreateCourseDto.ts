@@ -54,6 +54,6 @@ export class CreateCourseDto {
   @IsArray()
   @IsUUID('all', { each: true })
   @IsOptional()
-  @Transform(({ value }) => value ?? [])
+  @Transform(({ value }: { value: string[] | undefined }) => value || [])
   categoryIds: string[] = [];
 }

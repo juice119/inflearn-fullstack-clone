@@ -1,6 +1,6 @@
 import { fakerKO as faker } from '@faker-js/faker';
 import { TestingModule } from '@nestjs/testing';
-import { Course, Lecture, Prisma, Section, User } from '@prisma/client';
+import { Course, Lecture, Section, User } from '@prisma/client';
 import { hashSync } from 'bcryptjs';
 import { CoursesService } from 'src/courses/courses.service';
 import { CreateCourseDto } from 'src/courses/dto/CreateCourseDto';
@@ -25,7 +25,7 @@ export class LectureTestDataHelper {
     return this.module.get(SectionsService).create(course.id, user.id, createSectionDto);
   }
 
-  createCourse(user: User, update: Prisma.CourseUpdateInput = {}): Promise<Course> {
+  createCourse(user: User): Promise<Course> {
     const createCourseDto = new CreateCourseDto();
     createCourseDto.title = faker.book.title();
     createCourseDto.slug = faker.word.noun();
@@ -45,11 +45,11 @@ export class LectureTestDataHelper {
     });
   }
 
-  createLecture(section: Section, user: User): Promise<Lecture> {
+  createLecture(section: Section, user: User, update: Partial<Lecture> = {}): Promise<Lecture> {
     const createLectureDto = new CreateLectureDto();
-    createLectureDto.title = faker.word.noun();
-    createLectureDto.description = faker.commerce.productDescription();
-    createLectureDto.order = 1;
+    createLectureDto.title = update.title || faker.word.noun();
+    createLectureDto.description = update.description || faker.commerce.productDescription();
+    createLectureDto.order = update.order || 1;
 
     return this.module
       .get(LecturesService)

@@ -101,9 +101,7 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(UnauthorizedException);
-      expect((error as UnauthorizedException).message).toContain(
-        '유닛을 만들 수 있는 권한이 없습니다.',
-      );
+      expect((error as UnauthorizedException).message).toContain('유닛 생성 권한이 없습니다.');
     });
 
     it('유닛 순서가 중복되는 경우, 예외를 발생시킨다.', async () => {
@@ -129,24 +127,161 @@ describe('LecturesService', () => {
   });
 
   describe('findValidated', () => {
-    it('유효한 유닛을 조회한다.', () => {});
+    it('유효한 유닛을 조회한다.', async () => {
+      // given
+      const user = await testDataHelper.createUser();
+      const course = await testDataHelper.createCourse(user);
+      const section = await testDataHelper.createSection(course, user);
+      const lecture = await testDataHelper.createLecture(section, user);
 
-    it('유닛이 존재하지 않는 경우, 예외를 발생시킨다.', () => {});
+      // when
+      const result = await lectureService.findValidated(lecture.id);
 
-    it('삭제된 유닛은 조회하지 않는다.', () => {});
+      // then
+      expect(result.id).toBe(lecture.id);
+      expect(result.title).toBe(lecture.title);
+      expect(result.description).toBe(lecture.description);
+      expect(result.order).toBe(lecture.order);
+    });
+
+    it('유닛이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
+      // given
+      const notExistLectureId = 'not-exist-lecture-id';
+
+      // when
+      const error = await lectureService.findValidated(notExistLectureId).catch((e: unknown) => e);
+
+      // then
+      expect(error).toBeInstanceOf(NotFoundException);
+      expect((error as NotFoundException).message).toContain('유닛이 존재하지 않습니다.');
+    });
   });
 
   describe('update', () => {
-    it('유닛을 수정한다', () => {});
+    it('유닛을 수정한다', async () => {
+      // given
+      const user = await testDataHelper.createUser();
+      const course = await testDataHelper.createCourse(user);
+      const section = await testDataHelper.createSection(course, user);
+      const lecture = await testDataHelper.createLecture(section, user);
 
-    it('유저가 유닛을 수정할 수 있는 권한이 없는 경우, 예외를 발생시킨다.', () => {});
+      const updateLectureDto = testDataHelper.buildCreateLectureDto();
 
-    it('유닛 순서가 중복되는 경우, 예외를 발생시킨다.', () => {});
+      // when
+      const result = await lectureService.update(lecture.id, user.id, updateLectureDto);
+
+      // then
+      expect(result.id).toBe(lecture.id);
+      expect(result.title).toBe(updateLectureDto.title);
+      expect(result.description).toBe(updateLectureDto.description);
+      expect(result.order).toBe(updateLectureDto.order);
+    });
+
+    it('유닛이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
+      // given
+      const notExistLectureId = 'not-exist-lecture-id';
+      const updateLectureDto = testDataHelper.buildCreateLectureDto();
+
+      // when
+      const error = await lectureService
+        .update(notExistLectureId, 'not-exist-user-id', updateLectureDto)
+        .catch((e: unknown) => e);
+
+      // then
+      expect(error).toBeInstanceOf(NotFoundException);
+      expect((error as NotFoundException).message).toContain('유닛이 존재하지 않습니다.');
+    });
+
+    it('유저가 유닛을 수정할 수 있는 권한이 없는 경우, 예외를 발생시킨다.', async () => {
+      // given
+      const instructor = await testDataHelper.createUser();
+      const course = await testDataHelper.createCourse(instructor);
+      const section = await testDataHelper.createSection(course, instructor);
+      const lecture = await testDataHelper.createLecture(section, instructor);
+      const unauthorizedUser = await testDataHelper.createUser();
+      const updateLectureDto = testDataHelper.buildCreateLectureDto();
+
+      // when
+      const error = await lectureService
+        .update(lecture.id, unauthorizedUser.id, updateLectureDto)
+        .catch((e: unknown) => e);
+
+      // then
+      expect(error).toBeInstanceOf(UnauthorizedException);
+      expect((error as UnauthorizedException).message).toContain('유닛 수정 권한이 없습니다.');
+    });
+
+    it('유닛 순서가 중복되는 경우, 예외를 발생시킨다.', async () => {
+      // given
+      const user = await testDataHelper.createUser();
+      const course = await testDataHelper.createCourse(user);
+      const section = await testDataHelper.createSection(course, user);
+      const lecture = await testDataHelper.createLecture(section, user); // order: 1
+      const otherLecture = await testDataHelper.createLecture(section, user, {
+        order: lecture.order + 1,
+      });
+      const updateLectureDto = testDataHelper.buildCreateLectureDto();
+      updateLectureDto.order = otherLecture.order;
+
+      // when
+      const error = await lectureService
+        .update(lecture.id, user.id, updateLectureDto)
+        .catch((e: unknown) => e);
+
+      // then
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect((error as BadRequestException).message).toContain('유닛 순서가 중복되었습니다.');
+    });
   });
 
   describe('delete', () => {
-    it('유닛을 삭제한다', () => {});
+    it('유닛을 삭제한다', async () => {
+      // given
+      const user = await testDataHelper.createUser();
+      const course = await testDataHelper.createCourse(user);
+      const section = await testDataHelper.createSection(course, user);
+      const lecture = await testDataHelper.createLecture(section, user);
 
-    it('유닛 삭제 권한이 없는 경우, 예외를 발생시킨다.', () => {});
+      // when
+      await lectureService.delete(lecture.id, user.id);
+
+      // then
+      const deleteLecture = await appTestHelper.prismaService.lecture.findUnique({
+        where: { id: lecture.id },
+      });
+      expect(deleteLecture?.deletedAt).not.toBeNull();
+    });
+
+    it('유닛 삭제 권한이 없는 경우, 예외를 발생시킨다.', async () => {
+      // given
+      const instructor = await testDataHelper.createUser();
+      const course = await testDataHelper.createCourse(instructor);
+      const section = await testDataHelper.createSection(course, instructor);
+      const lecture = await testDataHelper.createLecture(section, instructor);
+      const unauthorizedUser = await testDataHelper.createUser();
+
+      // when
+      const error = await lectureService
+        .delete(lecture.id, unauthorizedUser.id)
+        .catch((e: unknown) => e);
+
+      // then
+      expect(error).toBeInstanceOf(UnauthorizedException);
+      expect((error as UnauthorizedException).message).toContain('유닛 삭제 권한이 없습니다.');
+    });
+
+    it('유닛이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
+      // given
+      const notExistLectureId = 'not-exist-lecture-id';
+
+      // when
+      const error = await lectureService
+        .delete(notExistLectureId, 'not-exist-user-id')
+        .catch((e: unknown) => e);
+
+      // then
+      expect(error).toBeInstanceOf(NotFoundException);
+      expect((error as NotFoundException).message).toContain('유닛이 존재하지 않습니다.');
+    });
   });
 });

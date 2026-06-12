@@ -1,8 +1,8 @@
 database:
-  url: "postgresql://prisma:prismapass@localhost:5432/inflearn_clone?schema=public"
+  url: 'postgresql://prisma:prismapass@localhost:5432/inflearn_clone?schema=public'
 
 jwt:
-  authSecret: "1e9e02aa8d213a5f94e24bcc9bf307c4f1d1a15ee140b8293f48983f90bedbe8"
+  authSecret: '1e9e02aa8d213a5f94e24bcc9bf307c4f1d1a15ee140b8293f48983f90bedbe8'
 
 server:
   port: 8000

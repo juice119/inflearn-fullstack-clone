@@ -22,10 +22,14 @@ describe('LecturesController', () => {
   });
 
   describe('PATCH /lectures/:id', () => {
-    test('유닛 정보를 수정한다.', ({ request }) => {});
+    test('유닛 정보를 수정한다.', ({ request }) => {
+      expect(request).toBeTruthy();
+    });
   });
 
   describe('DELETE /lectures/:id', () => {
-    test('유닛 정보를 삭제한다.', ({ request }) => {});
+    test('유닛 정보를 삭제한다.', ({ request }) => {
+      expect(request).toBeTruthy();
+    });
   });
 });

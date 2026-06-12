@@ -24,10 +24,10 @@ fi
 echo -e "${GREEN}✅ Docker 데몬 실행 확인.${NC}"
 
 
-if docker ps --filter "name=${CONTAINER_NAME}" --filter "status=running" | grep -q "${CONTAINER_NAME}"; then
-    echo -e "${GREEN}🏎️ 컨테이너가 이미 구동 중 입니다. 초기화단계를 스킵합니다. ${NC}"
-    exit 0
-fi
+# if docker ps --filter "name=${CONTAINER_NAME}" --filter "status=running" | grep -q "${CONTAINER_NAME}"; then
+#     echo -e "${GREEN}🏎️ 컨테이너가 이미 구동 중 입니다. 초기화단계를 스킵합니다. ${NC}"
+#     exit 0
+# fi
 
 
 # ---------------------------------------------------------
