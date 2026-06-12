@@ -1,12 +1,12 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
-import { SectionsService } from './sections.service';
-import { PrismaModel } from 'src/_gen/prisma-class';
 import { ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import { PrismaModel } from 'src/_gen/prisma-class';
 import { JwtAuth } from 'src/common/decorators/JwtAuth.decorator';
-import { CreateSectionDto } from './dto/CreateSection.dto';
 import { User } from 'src/common/decorators/user.decorator';
 import { JwtUserPayLoad } from 'src/common/JwtUserPayLoad';
+import { CreateSectionDto } from './dto/CreateSection.dto';
 import { UpdateSectionDto } from './dto/UpdateSection.dto';
+import { SectionsService } from './sections.service';
 
 @Controller('sections')
 export class SectionsController {
@@ -40,7 +40,7 @@ export class SectionsController {
     type: PrismaModel.Section,
   })
   findOne(@Param('sectionId', ParseUUIDPipe) sectionId: string) {
-    return this.sectionsService.findActivity(sectionId);
+    return this.sectionsService.findById(sectionId);
   }
 
   @Patch('/sections/:sectionId')

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { CreateSectionDto } from './dto/CreateSection.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateSectionDto } from './dto/CreateSection.dto';
 import { UpdateSectionDto } from './dto/UpdateSection.dto';
 
 @Injectable()
@@ -41,7 +41,7 @@ export class SectionsService {
     });
   }
 
-  findActivity(sectionId: string) {
+  findById(sectionId: string) {
     return this.prisma.section.findUnique({
       where: {
         id: sectionId,

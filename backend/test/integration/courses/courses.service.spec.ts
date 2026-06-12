@@ -1,49 +1,36 @@
-import { PrismaTestingHelper } from '@chax-at/transactional-prisma-testing';
-import { Test } from '@nestjs/testing';
 import { AppConfig } from 'src/common/config/AplicationConfig';
 import { CoursesService } from 'src/courses/courses.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AppTestHepler } from '../helpers/AppTestHepler';
 
 describe('CoursesService', () => {
   let service: CoursesService;
+  let appTestHelper: AppTestHepler;
   let prisma: PrismaService;
-  let prismaClient: PrismaService;
-  let prismaTestingHelper: PrismaTestingHelper<PrismaService>;
 
   beforeAll(async () => {
-    const appConfig = AppConfig.ofYml();
-    prismaClient = new PrismaService(appConfig);
-    await prismaClient.$connect();
-    prismaTestingHelper = new PrismaTestingHelper(prismaClient);
-    prisma = prismaTestingHelper.getProxyClient();
-
-    const module = await Test.createTestingModule({
-      providers: [
-        CoursesService,
-        {
-          provide: PrismaService,
-          useValue: prisma,
-        },
-        {
-          provide: AppConfig,
-          useValue: appConfig,
-        },
-      ],
-    }).compile();
+    const appConfig = AppConfig.ofYml('test');
+    appTestHelper = await AppTestHepler.of(appConfig);
+    const module = await appTestHelper
+      .createTestingModule({
+        providers: [CoursesService],
+      })
+      .compile();
 
     service = module.get(CoursesService);
+    prisma = appTestHelper.prismaService;
   });
 
   beforeEach(async () => {
-    await prismaTestingHelper.startNewTransaction({ timeout: 10_000 });
+    await appTestHelper.startTransaction();
   });
 
   afterEach(() => {
-    prismaTestingHelper.rollbackCurrentTransaction();
+    appTestHelper.rollbackTransaction();
   });
 
   afterAll(async () => {
-    await prismaClient.$disconnect();
+    await appTestHelper.disconnetDBConnection();
   });
 
   describe('create', () => {

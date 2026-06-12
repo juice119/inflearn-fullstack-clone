@@ -8,6 +8,7 @@ export default defineConfig({
       src: path.resolve(__dirname, './src'),
     },
   },
+
   test: {
     globals: true,
     root: './',
@@ -22,6 +23,7 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
     },
+    setupFiles: ['reflect-metadata'],
   },
   plugins: [
     swc.vite({

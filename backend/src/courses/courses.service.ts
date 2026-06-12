@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Course, Prisma } from '@prisma/client';
+import slug from 'slug';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCourseDto } from './dto/CreateCourseDto';
-import { Course, Prisma } from '@prisma/client';
 import { UpdateCourseDto } from './dto/UpdateCourseDto';
-import slug from 'slug';
 
 @Injectable()
 export class CoursesService {
@@ -40,7 +40,7 @@ export class CoursesService {
     });
   }
 
-  async findOne(id: string, include: string[] = []) {
+  async findById(id: string, include: string[] = []) {
     const includeObject = {};
 
     if (include) {

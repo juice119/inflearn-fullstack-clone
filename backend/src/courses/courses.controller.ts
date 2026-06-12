@@ -1,13 +1,13 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
-import { CoursesService } from './courses.service';
+import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
+import { Prisma } from '@prisma/client';
+import { PrismaModel } from 'src/_gen/prisma-class';
 import { JwtAuth } from 'src/common/decorators/JwtAuth.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { JwtUserPayLoad } from 'src/common/JwtUserPayLoad';
+import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/CreateCourseDto';
-import { ApiOkResponse, ApiQuery } from '@nestjs/swagger';
-import { Prisma } from '@prisma/client';
 import { UpdateCourseDto } from './dto/UpdateCourseDto';
-import { PrismaModel } from 'src/_gen/prisma-class';
 
 @Controller('courses')
 export class CoursesController {
@@ -77,7 +77,7 @@ export class CoursesController {
   })
   findOne(@Param('id', ParseUUIDPipe) id: string, @Query('include') include?: string) {
     const includeArray = include ? include.split(',') : undefined;
-    return this.coursesService.findOne(id, includeArray);
+    return this.coursesService.findById(id, includeArray);
   }
 
   @Patch(':id')

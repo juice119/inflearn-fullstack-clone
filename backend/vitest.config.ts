@@ -12,7 +12,7 @@ export default defineConfig({
     globals: true,
     root: './',
     environment: 'node',
-    include: ['test/**/*.spec.ts'],
+    include: ['test/unit/**/*.spec.ts'],
     // Playwright E2E 테스트 폴더 및 node_modules는 스캔에서 제외
     exclude: ['test/e2e/**/*', 'node_modules/**/*'],
     coverage: {
@@ -24,6 +24,7 @@ export default defineConfig({
     env: {
       NODE_ENV: 'test',
     },
+    setupFiles: ['reflect-metadata'],
   },
   plugins: [
     swc.vite({
