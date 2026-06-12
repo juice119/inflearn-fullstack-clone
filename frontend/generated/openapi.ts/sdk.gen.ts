@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AppControllerGetHelloData, AppControllerGetHelloResponses, AppControllerTestUserData, AppControllerTestUserResponses, CoursesControllerCreateData, CoursesControllerCreateResponses, CoursesControllerFindAllData, CoursesControllerFindAllResponses, CoursesControllerFindOneData, CoursesControllerFindOneResponses, CoursesControllerUpdateData, CoursesControllerUpdateResponses } from './types.gen';
+import type { AppControllerHcData, AppControllerHcResponses, CategoriesControllerFindAllData, CategoriesControllerFindAllResponses, CoursesControllerCreateData, CoursesControllerCreateResponses, CoursesControllerFindAllData, CoursesControllerFindAllResponses, CoursesControllerFindOneData, CoursesControllerFindOneResponses, CoursesControllerUpdateData, CoursesControllerUpdateResponses, LecturesControllerCreateData, LecturesControllerCreateResponses, LecturesControllerDeleteData, LecturesControllerDeleteResponses, LecturesControllerFindOneData, LecturesControllerFindOneResponses, LecturesControllerUpdateData, LecturesControllerUpdateResponses, SectionsControllerCreateData, SectionsControllerCreateResponses, SectionsControllerDeleteData, SectionsControllerDeleteResponses, SectionsControllerFindOneData, SectionsControllerFindOneResponses, SectionsControllerUpdateData, SectionsControllerUpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -18,13 +18,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
-export const appControllerGetHello = <ThrowOnError extends boolean = false>(options?: Options<AppControllerGetHelloData, ThrowOnError>): RequestResult<AppControllerGetHelloResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AppControllerGetHelloResponses, unknown, ThrowOnError>({ url: '/', ...options });
-
-export const appControllerTestUser = <ThrowOnError extends boolean = false>(options?: Options<AppControllerTestUserData, ThrowOnError>): RequestResult<AppControllerTestUserResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AppControllerTestUserResponses, unknown, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/user-test',
-    ...options
-});
+export const appControllerHc = <ThrowOnError extends boolean = false>(options?: Options<AppControllerHcData, ThrowOnError>): RequestResult<AppControllerHcResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AppControllerHcResponses, unknown, ThrowOnError>({ url: '/hc', ...options });
 
 export const coursesControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<CoursesControllerFindAllData, ThrowOnError>): RequestResult<CoursesControllerFindAllResponses, unknown, ThrowOnError> => (options?.client ?? client).get<CoursesControllerFindAllResponses, unknown, ThrowOnError>({ url: '/courses', ...options });
 
@@ -49,3 +43,61 @@ export const coursesControllerUpdate = <ThrowOnError extends boolean = false>(op
         ...options.headers
     }
 });
+
+export const lecturesControllerCreate = <ThrowOnError extends boolean = false>(options: Options<LecturesControllerCreateData, ThrowOnError>): RequestResult<LecturesControllerCreateResponses, unknown, ThrowOnError> => (options.client ?? client).post<LecturesControllerCreateResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/lectures/courses/{courseId}/sections/{sectionId}/lectures',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const lecturesControllerDelete = <ThrowOnError extends boolean = false>(options: Options<LecturesControllerDeleteData, ThrowOnError>): RequestResult<LecturesControllerDeleteResponses, unknown, ThrowOnError> => (options.client ?? client).delete<LecturesControllerDeleteResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/lectures/{id}',
+    ...options
+});
+
+export const lecturesControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<LecturesControllerFindOneData, ThrowOnError>): RequestResult<LecturesControllerFindOneResponses, unknown, ThrowOnError> => (options.client ?? client).get<LecturesControllerFindOneResponses, unknown, ThrowOnError>({ url: '/lectures/{id}', ...options });
+
+export const lecturesControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<LecturesControllerUpdateData, ThrowOnError>): RequestResult<LecturesControllerUpdateResponses, unknown, ThrowOnError> => (options.client ?? client).patch<LecturesControllerUpdateResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/lectures/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const sectionsControllerCreate = <ThrowOnError extends boolean = false>(options: Options<SectionsControllerCreateData, ThrowOnError>): RequestResult<SectionsControllerCreateResponses, unknown, ThrowOnError> => (options.client ?? client).post<SectionsControllerCreateResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/sections/courses/{courseId}/sections',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const sectionsControllerDelete = <ThrowOnError extends boolean = false>(options: Options<SectionsControllerDeleteData, ThrowOnError>): RequestResult<SectionsControllerDeleteResponses, unknown, ThrowOnError> => (options.client ?? client).delete<SectionsControllerDeleteResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/sections/sections/{sectionId}',
+    ...options
+});
+
+export const sectionsControllerFindOne = <ThrowOnError extends boolean = false>(options: Options<SectionsControllerFindOneData, ThrowOnError>): RequestResult<SectionsControllerFindOneResponses, unknown, ThrowOnError> => (options.client ?? client).get<SectionsControllerFindOneResponses, unknown, ThrowOnError>({ url: '/sections/sections/{sectionId}', ...options });
+
+export const sectionsControllerUpdate = <ThrowOnError extends boolean = false>(options: Options<SectionsControllerUpdateData, ThrowOnError>): RequestResult<SectionsControllerUpdateResponses, unknown, ThrowOnError> => (options.client ?? client).patch<SectionsControllerUpdateResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/sections/sections/{sectionId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const categoriesControllerFindAll = <ThrowOnError extends boolean = false>(options?: Options<CategoriesControllerFindAllData, ThrowOnError>): RequestResult<CategoriesControllerFindAllResponses, unknown, ThrowOnError> => (options?.client ?? client).get<CategoriesControllerFindAllResponses, unknown, ThrowOnError>({ url: '/categories', ...options });

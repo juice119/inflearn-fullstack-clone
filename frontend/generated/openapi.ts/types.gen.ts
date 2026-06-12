@@ -123,6 +123,7 @@ export type User = {
     hashedPassword?: string;
     image?: string;
     bio?: string;
+    createdSections: Array<Section>;
     accounts: Array<Account>;
     sessions: Array<Session>;
     courses: Array<Course>;
@@ -131,6 +132,7 @@ export type User = {
     courseQuestions: Array<CourseQuestion>;
     courseComments: Array<CourseComment>;
     lectureActivities: Array<LectureActivity>;
+    sections: Array<Section>;
 };
 
 export type LectureActivity = {
@@ -158,6 +160,7 @@ export type Lecture = {
     };
     createdAt: string;
     updatedAt: string;
+    deletedAt?: string;
     section: Section;
     course: Course;
     activities: Array<LectureActivity>;
@@ -201,11 +204,16 @@ export type Section = {
     title: string;
     description?: string;
     order: number;
+    createdUserId: string;
     courseId: string;
     createdAt: string;
     updatedAt: string;
+    deletedAt?: string;
     course: Course;
     lectures: Array<Lecture>;
+    createdUser: User;
+    user?: User;
+    userId?: string;
 };
 
 export type UpdateCourseDto = {
@@ -247,25 +255,62 @@ export type UpdateCourseDto = {
     categoryIds?: Array<string>;
 };
 
-export type AppControllerGetHelloData = {
+export type CreateLectureDto = {
+    /**
+     * 유닛 제목
+     */
+    title: string;
+    /**
+     * 유닛 설명
+     */
+    description: string;
+    /**
+     * 유닛 순서
+     */
+    order: number;
+};
+
+export type UpdateLectureDto = {
+    /**
+     * 유닛 제목
+     */
+    title?: string;
+    /**
+     * 유닛 설명
+     */
+    description?: string;
+    /**
+     * 강의 순서
+     */
+    order?: number;
+};
+
+export type CreateSectionDto = {
+    /**
+     * 섹션 제목
+     */
+    title: string;
+};
+
+export type UpdateSectionDto = {
+    /**
+     * 섹션 제목
+     */
+    title?: string;
+    /**
+     * 섹션 설명
+     */
+    description: string;
+};
+
+export type AppControllerHcData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/';
+    url: '/hc';
 };
 
-export type AppControllerGetHelloResponses = {
-    200: unknown;
-};
-
-export type AppControllerTestUserData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/user-test';
-};
-
-export type AppControllerTestUserResponses = {
+export type AppControllerHcResponses = {
     200: unknown;
 };
 
@@ -347,3 +392,162 @@ export type CoursesControllerUpdateResponses = {
 };
 
 export type CoursesControllerUpdateResponse = CoursesControllerUpdateResponses[keyof CoursesControllerUpdateResponses];
+
+export type LecturesControllerCreateData = {
+    body: CreateLectureDto;
+    path: {
+        /**
+         * 강의 ID
+         */
+        courseId: string;
+        /**
+         * 섹션 ID
+         */
+        sectionId: string;
+    };
+    query?: never;
+    url: '/lectures/courses/{courseId}/sections/{sectionId}/lectures';
+};
+
+export type LecturesControllerCreateResponses = {
+    201: unknown;
+};
+
+export type LecturesControllerDeleteData = {
+    body?: never;
+    path: {
+        /**
+         * 유닛 ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/lectures/{id}';
+};
+
+export type LecturesControllerDeleteResponses = {
+    200: unknown;
+};
+
+export type LecturesControllerFindOneData = {
+    body?: never;
+    path: {
+        /**
+         * 유닛 ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/lectures/{id}';
+};
+
+export type LecturesControllerFindOneResponses = {
+    200: unknown;
+};
+
+export type LecturesControllerUpdateData = {
+    body: UpdateLectureDto;
+    path: {
+        /**
+         * 유닛 ID
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/lectures/{id}';
+};
+
+export type LecturesControllerUpdateResponses = {
+    200: unknown;
+};
+
+export type SectionsControllerCreateData = {
+    body: CreateSectionDto;
+    path: {
+        /**
+         * 강의 ID
+         */
+        courseId: string;
+    };
+    query?: never;
+    url: '/sections/courses/{courseId}/sections';
+};
+
+export type SectionsControllerCreateResponses = {
+    /**
+     * 생성된 섹션
+     */
+    200: Section;
+};
+
+export type SectionsControllerCreateResponse = SectionsControllerCreateResponses[keyof SectionsControllerCreateResponses];
+
+export type SectionsControllerDeleteData = {
+    body?: never;
+    path: {
+        sectionId: string;
+    };
+    query?: never;
+    url: '/sections/sections/{sectionId}';
+};
+
+export type SectionsControllerDeleteResponses = {
+    /**
+     * 섹션 삭제
+     */
+    200: Section;
+};
+
+export type SectionsControllerDeleteResponse = SectionsControllerDeleteResponses[keyof SectionsControllerDeleteResponses];
+
+export type SectionsControllerFindOneData = {
+    body?: never;
+    path: {
+        sectionId: string;
+    };
+    query?: never;
+    url: '/sections/sections/{sectionId}';
+};
+
+export type SectionsControllerFindOneResponses = {
+    /**
+     * 섹션 조회
+     */
+    200: Section;
+};
+
+export type SectionsControllerFindOneResponse = SectionsControllerFindOneResponses[keyof SectionsControllerFindOneResponses];
+
+export type SectionsControllerUpdateData = {
+    body: UpdateSectionDto;
+    path: {
+        sectionId: string;
+    };
+    query?: never;
+    url: '/sections/sections/{sectionId}';
+};
+
+export type SectionsControllerUpdateResponses = {
+    /**
+     * 섹션 수정
+     */
+    200: Section;
+};
+
+export type SectionsControllerUpdateResponse = SectionsControllerUpdateResponses[keyof SectionsControllerUpdateResponses];
+
+export type CategoriesControllerFindAllData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/categories';
+};
+
+export type CategoriesControllerFindAllResponses = {
+    /**
+     * 카테고리 목록
+     */
+    200: Array<CourseCategory>;
+};
+
+export type CategoriesControllerFindAllResponse = CategoriesControllerFindAllResponses[keyof CategoriesControllerFindAllResponses];
