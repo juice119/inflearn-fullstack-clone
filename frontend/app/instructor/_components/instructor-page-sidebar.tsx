@@ -60,7 +60,7 @@ export default function InstructorPageSidebar() {
             key={item.label}
             variant="link"
             className={`justify-start w-full text-base font-medium ${
-              isActive ? 'bg-white text-green-700' : ''
+              isActive ? 'bg-white primary fonrt-bold' : 'text-gray-700'
             }`}
             onClick={isPreparing ? alertPreparing : undefined}
             asChild={!isPreparing}

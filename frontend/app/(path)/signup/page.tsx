@@ -1,7 +1,7 @@
 'use client';
 
 import { signUp } from '@/app/actions/auth-actions';
-import { Link } from 'lucide-react';
+import Link from 'next/link';
 import { useState, type SubmitEvent } from 'react';
 
 export default function SignupPage() {

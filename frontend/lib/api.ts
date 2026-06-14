@@ -4,6 +4,9 @@ import {
   categoriesControllerFindAll,
   coursesControllerCreate,
   coursesControllerFindAll,
+  coursesControllerFindOne,
+  coursesControllerUpdate,
+  UpdateCourseDto,
 } from '@/generated/openapi.ts';
 
 function serializeApiResponse<T>({ data, error }: { data: T | undefined; error: unknown }): {
@@ -48,6 +51,25 @@ export async function createCourse(title: string) {
       level: 'BEGINNER',
       categoryIds: [],
     },
+  });
+  return serializeApiResponse(response);
+}
+
+export async function getCourseById(id: string) {
+  const response = await coursesControllerFindOne({
+    path: {
+      id,
+    },
+  });
+  return serializeApiResponse(response);
+}
+
+export async function updateCourse(id: string, data: UpdateCourseDto) {
+  const response = await coursesControllerUpdate({
+    path: {
+      id,
+    },
+    body: data,
   });
   return serializeApiResponse(response);
 }

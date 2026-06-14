@@ -3,6 +3,7 @@ import Providers from '@/config/provider';
 import * as api from '@/lib/api';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default async function RootLayout({
           <SiteHeader categories={categories.data ?? []} />
           {children}
         </Providers>
+        <Toaster />
       </body>
     </html>
   );
