@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["partialIndexes"]
 }
 
 generator prismaClassGenerator {
@@ -140,7 +141,7 @@ model Lecture {
   course     Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
   activities LectureActivity[]
 
-  @@unique([sectionId, order])
+  @@unique([sectionId, order], where: { deletedAt: null })
   @@map("lectures")
 }
 
