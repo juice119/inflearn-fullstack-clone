@@ -6,7 +6,14 @@ import {
   coursesControllerFindAll,
   coursesControllerFindOne,
   coursesControllerUpdate,
+  CreateLectureDto,
+  lecturesControllerCreate,
+  lecturesControllerDelete,
+  sectionsControllerCreate,
+  sectionsControllerDelete,
+  sectionsControllerUpdate,
   UpdateCourseDto,
+  UpdateSectionDto,
 } from '@/generated/openapi.ts';
 
 function serializeApiResponse<T>({ data, error }: { data: T | undefined; error: unknown }): {
@@ -55,11 +62,12 @@ export async function createCourse(title: string) {
   return serializeApiResponse(response);
 }
 
-export async function getCourseById(id: string) {
+export async function getCourseById(id: string, include?: string) {
   const response = await coursesControllerFindOne({
     path: {
       id,
     },
+    query: include ? { include } : undefined,
   });
   return serializeApiResponse(response);
 }
@@ -70,6 +78,57 @@ export async function updateCourse(id: string, data: UpdateCourseDto) {
       id,
     },
     body: data,
+  });
+  return serializeApiResponse(response);
+}
+
+export async function createSection(courseId: string, title: string) {
+  const response = await sectionsControllerCreate({
+    path: {
+      courseId,
+    },
+    body: {
+      title,
+    },
+  });
+  return serializeApiResponse(response);
+}
+
+export async function deleteSection(sectionId: string) {
+  const response = await sectionsControllerDelete({
+    path: {
+      sectionId,
+    },
+  });
+  return serializeApiResponse(response);
+}
+
+export async function updateSection(sectionId: string, data: UpdateSectionDto) {
+  const response = await sectionsControllerUpdate({
+    path: {
+      sectionId,
+    },
+    body: data,
+  });
+  return serializeApiResponse(response);
+}
+
+export async function createLecture(courseId: string, sectionId: string, data: CreateLectureDto) {
+  const response = await lecturesControllerCreate({
+    path: {
+      courseId,
+      sectionId,
+    },
+    body: data,
+  });
+  return serializeApiResponse(response);
+}
+
+export async function deleteLecture(lectureId: string) {
+  const response = await lecturesControllerDelete({
+    path: {
+      id: lectureId,
+    },
   });
   return serializeApiResponse(response);
 }

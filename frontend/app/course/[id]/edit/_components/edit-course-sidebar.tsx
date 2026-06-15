@@ -8,7 +8,7 @@ import { useParams, usePathname } from 'next/navigation';
 const creationItems = [
   {
     label: '강의 정보',
-    segment: 'course-info',
+    segment: 'course_info',
     legacySegments: ['course_info'],
   },
   {
@@ -27,7 +27,7 @@ const creationItems = [
 ] as const;
 
 function isItemActive(pathname: string, courseId: string, item: (typeof creationItems)[number]) {
-  const href = `/courses/${courseId}/edit/${item.segment}`;
+  const href = `/course/${courseId}/edit/${item.segment}`;
 
   if (pathname === href || pathname.startsWith(`${href}/`)) {
     return true;
@@ -35,7 +35,7 @@ function isItemActive(pathname: string, courseId: string, item: (typeof creation
 
   if ('legacySegments' in item && item.legacySegments) {
     return item.legacySegments.some((segment) => {
-      const legacyHref = `/courses/${courseId}/edit/${segment}`;
+      const legacyHref = `/course/${courseId}/edit/${segment}`;
       return pathname === legacyHref || pathname.startsWith(`${legacyHref}/`);
     });
   }
@@ -67,7 +67,7 @@ export default function EditCourseSidebar() {
       <nav aria-label="강의 제작">
         <ul className="flex flex-col">
           {creationItems.map((item, index) => {
-            const href = `/courses/${id}/edit/${item.segment}`;
+            const href = `/course/${id}/edit/${item.segment}`;
             const isActive = isItemActive(pathname, id, item);
             const isLast = index === creationItems.length - 1;
 

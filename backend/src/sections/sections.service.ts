@@ -34,7 +34,7 @@ export class SectionsService {
     return this.prisma.section.create({
       data: {
         title: createSectionDto.title,
-        order: lastOrderSection?.order || 0 + 1,
+        order: (lastOrderSection?.order || 0) + 1,
         courseId: courseId,
         createdUserId: userId,
       },
