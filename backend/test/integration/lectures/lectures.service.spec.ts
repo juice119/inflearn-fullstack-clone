@@ -1,5 +1,7 @@
 import { BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Course, Section, User } from '@prisma/client';
 import { CoursesService } from 'src/courses/courses.service';
+import { CreateLectureDto } from 'src/lectures/dto/CreateLecture.dto';
 import { LecturesService } from 'src/lectures/lectures.service';
 import { SectionsService } from 'src/sections/sections.service';
 import { AppTestHepler } from '../helpers/AppTestHepler';
@@ -37,7 +39,7 @@ describe('LecturesService', () => {
   });
 
   describe('create', () => {
-    it('새로운 유닛을 생성한다.', async () => {
+    it('새로운 수업을 생성한다.', async () => {
       // given
       const user = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(user);
@@ -51,7 +53,27 @@ describe('LecturesService', () => {
       // then
       expect(lecture.title).toBe(createLectureDto.title);
       expect(lecture.description).toBe(createLectureDto.description);
-      expect(lecture.order).toBe(createLectureDto.order);
+    });
+
+    it('수업은 마지막 순서 바로 위에 생성된다.', async () => {
+      // given
+      const {
+        user,
+        course,
+        section,
+        lecture: firstOrderLecture,
+      } = await createTestLecture(testDataHelper);
+
+      // when
+      const lecture = await lectureService.create(
+        course.id,
+        section.id,
+        user.id,
+        testDataHelper.buildCreateLectureDto(),
+      );
+
+      //then
+      expect(lecture.order).toBe(firstOrderLecture.order + 1);
     });
 
     it('강의가 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
@@ -86,7 +108,7 @@ describe('LecturesService', () => {
       expect((error as NotFoundException).message).toContain('섹션이 존재하지 않습니다.');
     });
 
-    it('유저가 유닛을 생성할 수 있는 권한이 없는 경우, 예외를 발생시킨다.', async () => {
+    it('유저가 수업을 생성할 수 있는 권한이 없는 경우, 예외를 발생시킨다.', async () => {
       // given
       const instructor = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(instructor);
@@ -101,33 +123,12 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(UnauthorizedException);
-      expect((error as UnauthorizedException).message).toContain('유닛 생성 권한이 없습니다.');
-    });
-
-    it('유닛 순서가 중복되는 경우, 예외를 발생시킨다.', async () => {
-      // given
-      const user = await testDataHelper.createUser();
-      const course = await testDataHelper.createCourse(user);
-      const section = await testDataHelper.createSection(course, user);
-      const createLectureDto = await testDataHelper.createLecture(section, user);
-
-      const duplicateOrderLectureDto = testDataHelper.buildCreateLectureDto();
-      duplicateOrderLectureDto.title = '중복 순서 유닛';
-      duplicateOrderLectureDto.order = createLectureDto.order;
-
-      // when
-      const error = await lectureService
-        .create(course.id, section.id, user.id, duplicateOrderLectureDto)
-        .catch((e: unknown) => e);
-
-      // then
-      expect(error).toBeInstanceOf(BadRequestException);
-      expect((error as BadRequestException).message).toContain('유닛 순서가 중복되었습니다.');
+      expect((error as UnauthorizedException).message).toContain('수업 생성 권한이 없습니다.');
     });
   });
 
   describe('findValidated', () => {
-    it('유효한 유닛을 조회한다.', async () => {
+    it('유효한 수업을 조회한다.', async () => {
       // given
       const user = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(user);
@@ -144,7 +145,7 @@ describe('LecturesService', () => {
       expect(result.order).toBe(lecture.order);
     });
 
-    it('유닛이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
+    it('수업이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
       // given
       const notExistLectureId = 'not-exist-lecture-id';
 
@@ -153,19 +154,19 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(NotFoundException);
-      expect((error as NotFoundException).message).toContain('유닛이 존재하지 않습니다.');
+      expect((error as NotFoundException).message).toContain('수업이 존재하지 않습니다.');
     });
   });
 
   describe('update', () => {
-    it('유닛을 수정한다', async () => {
+    it('수업을 수정한다', async () => {
       // given
       const user = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(user);
       const section = await testDataHelper.createSection(course, user);
       const lecture = await testDataHelper.createLecture(section, user);
 
-      const updateLectureDto = testDataHelper.buildCreateLectureDto();
+      const updateLectureDto = testDataHelper.buildUpdateLectureDto();
 
       // when
       const result = await lectureService.update(lecture.id, user.id, updateLectureDto);
@@ -177,10 +178,10 @@ describe('LecturesService', () => {
       expect(result.order).toBe(updateLectureDto.order);
     });
 
-    it('유닛이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
+    it('수업이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
       // given
       const notExistLectureId = 'not-exist-lecture-id';
-      const updateLectureDto = testDataHelper.buildCreateLectureDto();
+      const updateLectureDto = testDataHelper.buildUpdateLectureDto();
 
       // when
       const error = await lectureService
@@ -189,17 +190,17 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(NotFoundException);
-      expect((error as NotFoundException).message).toContain('유닛이 존재하지 않습니다.');
+      expect((error as NotFoundException).message).toContain('수업이 존재하지 않습니다.');
     });
 
-    it('유저가 유닛을 수정할 수 있는 권한이 없는 경우, 예외를 발생시킨다.', async () => {
+    it('유저가 수업을 수정할 수 있는 권한이 없는 경우, 예외를 발생시킨다.', async () => {
       // given
       const instructor = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(instructor);
       const section = await testDataHelper.createSection(course, instructor);
       const lecture = await testDataHelper.createLecture(section, instructor);
       const unauthorizedUser = await testDataHelper.createUser();
-      const updateLectureDto = testDataHelper.buildCreateLectureDto();
+      const updateLectureDto = testDataHelper.buildUpdateLectureDto();
 
       // when
       const error = await lectureService
@@ -208,10 +209,10 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(UnauthorizedException);
-      expect((error as UnauthorizedException).message).toContain('유닛 수정 권한이 없습니다.');
+      expect((error as UnauthorizedException).message).toContain('수업 수정 권한이 없습니다.');
     });
 
-    it('유닛 순서가 중복되는 경우, 예외를 발생시킨다.', async () => {
+    it('수업 순서가 중복되는 경우, 예외를 발생시킨다.', async () => {
       // given
       const user = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(user);
@@ -220,7 +221,7 @@ describe('LecturesService', () => {
       const otherLecture = await testDataHelper.createLecture(section, user, {
         order: lecture.order + 1,
       });
-      const updateLectureDto = testDataHelper.buildCreateLectureDto();
+      const updateLectureDto = testDataHelper.buildUpdateLectureDto();
       updateLectureDto.order = otherLecture.order;
 
       // when
@@ -230,12 +231,12 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(BadRequestException);
-      expect((error as BadRequestException).message).toContain('유닛 순서가 중복되었습니다.');
+      expect((error as BadRequestException).message).toContain('수업 순서가 중복되었습니다.');
     });
   });
 
   describe('delete', () => {
-    it('유닛을 삭제한다', async () => {
+    it('수업을 삭제한다', async () => {
       // given
       const user = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(user);
@@ -252,7 +253,7 @@ describe('LecturesService', () => {
       expect(deleteLecture?.deletedAt).not.toBeNull();
     });
 
-    it('유닛 삭제 권한이 없는 경우, 예외를 발생시킨다.', async () => {
+    it('수업 삭제 권한이 없는 경우, 예외를 발생시킨다.', async () => {
       // given
       const instructor = await testDataHelper.createUser();
       const course = await testDataHelper.createCourse(instructor);
@@ -267,10 +268,10 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(UnauthorizedException);
-      expect((error as UnauthorizedException).message).toContain('유닛 삭제 권한이 없습니다.');
+      expect((error as UnauthorizedException).message).toContain('수업 삭제 권한이 없습니다.');
     });
 
-    it('유닛이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
+    it('수업이 존재하지 않는 경우, 예외를 발생시킨다.', async () => {
       // given
       const notExistLectureId = 'not-exist-lecture-id';
 
@@ -281,7 +282,29 @@ describe('LecturesService', () => {
 
       // then
       expect(error).toBeInstanceOf(NotFoundException);
-      expect((error as NotFoundException).message).toContain('유닛이 존재하지 않습니다.');
+      expect((error as NotFoundException).message).toContain('수업이 존재하지 않습니다.');
     });
   });
 });
+
+async function createTestLecture(
+  testDataHelper: TestDataHelper,
+  {
+    user,
+    course,
+    section,
+    createLectureDto,
+  }: { user?: User; course?: Course; section?: Section; createLectureDto?: CreateLectureDto } = {},
+) {
+  const testUser = user || (await testDataHelper.createUser());
+  const testCourse = course || (await testDataHelper.createCourse(testUser));
+  const testSection = section || (await testDataHelper.createSection(testCourse, testUser));
+  const testLecture = await testDataHelper.createLecture(testSection, testUser, createLectureDto);
+
+  return {
+    user: testUser,
+    course: testCourse,
+    section: testSection,
+    lecture: testLecture,
+  };
+}

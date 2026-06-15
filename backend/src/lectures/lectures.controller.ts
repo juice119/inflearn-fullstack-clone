@@ -41,7 +41,7 @@ export class LecturesController {
   @Get('/:id')
   @ApiParam({
     name: 'id',
-    description: '유닛 ID',
+    description: '수업 ID',
     type: 'string',
     format: 'uuid',
     example: '6c091a0e-6024-443e-9ce4-19a4fb4dea2d',
@@ -54,7 +54,7 @@ export class LecturesController {
   @JwtAuth()
   @ApiParam({
     name: 'id',
-    description: '유닛 ID',
+    description: '수업 ID',
     type: 'string',
     format: 'uuid',
     example: '6c091a0e-6024-443e-9ce4-19a4fb4dea2d',
@@ -72,7 +72,7 @@ export class LecturesController {
   @JwtAuth()
   @ApiParam({
     name: 'id',
-    description: '유닛 ID',
+    description: '수업 ID',
     type: 'string',
     format: 'uuid',
     example: '6c091a0e-6024-443e-9ce4-19a4fb4dea2d',

@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+globs: backend/test/**/*.spec.ts
+alwaysApply: false
 ---
 
 Strictly enforce the following testing architecture and conventions. No exceptions.

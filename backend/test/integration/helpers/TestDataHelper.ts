@@ -5,6 +5,7 @@ import { hashSync } from 'bcryptjs';
 import { CoursesService } from 'src/courses/courses.service';
 import { CreateCourseDto } from 'src/courses/dto/CreateCourseDto';
 import { CreateLectureDto } from 'src/lectures/dto/CreateLecture.dto';
+import { UpdateLectureDto } from 'src/lectures/dto/UpdateLecture.dto';
 import { LecturesService } from 'src/lectures/lectures.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSectionDto } from 'src/sections/dto/CreateSection.dto';
@@ -49,7 +50,6 @@ export class TestDataHelper {
     const createLectureDto = new CreateLectureDto();
     createLectureDto.title = update.title || faker.word.noun();
     createLectureDto.description = update.description || faker.commerce.productDescription();
-    createLectureDto.order = update.order || 1;
 
     return this.module
       .get(LecturesService)
@@ -68,9 +68,22 @@ export class TestDataHelper {
 
   buildCreateLectureDto(): CreateLectureDto {
     const createLectureDto = new CreateLectureDto();
-    createLectureDto.title = '테스트 유닛';
-    createLectureDto.description = '테스트 유닛 설명';
-    createLectureDto.order = 1;
+    createLectureDto.title = '테스트 수업';
+    createLectureDto.description = '테스트 수업 설명';
     return createLectureDto;
+  }
+
+  buildUpdateLectureDto({
+    title,
+    description,
+    order,
+  }: Partial<UpdateLectureDto> = {}): UpdateLectureDto {
+    const updateLectureDto = new UpdateLectureDto();
+
+    updateLectureDto.title = title || '테스트 수업';
+    updateLectureDto.description = description || '테스트 수업 설명';
+    updateLectureDto.order = order || 1;
+
+    return updateLectureDto;
   }
 }

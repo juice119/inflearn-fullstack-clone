@@ -25,16 +25,30 @@ export class LecturesService {
     userId: string,
     createLectureDto: CreateLectureDto,
   ): Promise<Lecture> {
-    await this.validateCreateRule(userId, courseId, sectionId, createLectureDto.order);
+    await this.validateCreateRule(userId, courseId, sectionId);
 
-    return this.prisma.lecture.create({
-      data: {
-        title: createLectureDto.title,
-        description: createLectureDto.description,
-        order: createLectureDto.order,
-        sectionId: sectionId,
-        courseId: courseId,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT id FROM sections WHERE id = ${sectionId} FOR UPDATE`;
+
+      const lastOrderLecture = await tx.lecture.findFirst({
+        where: {
+          sectionId: sectionId,
+          deletedAt: null,
+        },
+        orderBy: {
+          order: 'desc',
+        },
+      });
+
+      return tx.lecture.create({
+        data: {
+          title: createLectureDto.title,
+          description: createLectureDto.description,
+          sectionId: sectionId,
+          courseId: courseId,
+          order: (lastOrderLecture?.order ?? 0) + 1,
+        },
+      });
     });
   }
 
@@ -47,7 +61,7 @@ export class LecturesService {
     });
 
     if (!lecture) {
-      throw new NotFoundException(`유닛이 존재하지 않습니다. lectureId: ${id}`);
+      throw new NotFoundException(`수업이 존재하지 않습니다. lectureId: ${id}`);
     }
 
     return lecture;
@@ -89,11 +103,11 @@ export class LecturesService {
     });
 
     if (!lecture) {
-      throw new NotFoundException(`유닛이 존재하지 않습니다. lectureId: ${lectureId}`);
+      throw new NotFoundException(`수업이 존재하지 않습니다. lectureId: ${lectureId}`);
     }
 
     if (lecture.section.course.instructorId !== userId) {
-      throw new UnauthorizedException(`유닛 삭제 권한이 없습니다. courseId: ${lecture.courseId}`);
+      throw new UnauthorizedException(`수업 삭제 권한이 없습니다. courseId: ${lecture.courseId}`);
     }
   }
 
@@ -120,12 +134,12 @@ export class LecturesService {
     }
 
     if (course.instructorId !== userId) {
-      throw new UnauthorizedException(`유닛 수정 권한이 없습니다. courseId: ${lecture.courseId}`);
+      throw new UnauthorizedException(`수업 수정 권한이 없습니다. courseId: ${lecture.courseId}`);
     }
 
     if (duplicateOrderLecture) {
       throw new BadRequestException(
-        `유닛 순서가 중복되었습니다. 순서를 다시 확인해주세요. order: ${updateLectureDto.order}`,
+        `수업 순서가 중복되었습니다. 순서를 다시 확인해주세요. order: ${updateLectureDto.order}`,
       );
     }
 
@@ -134,22 +148,10 @@ export class LecturesService {
     }
   }
 
-  private async validateCreateRule(
-    userId: string,
-    courseId: string,
-    sectionId: string,
-    order: number,
-  ) {
-    const [course, section, duplicateOrderLecture] = await Promise.all([
+  private async validateCreateRule(userId: string, courseId: string, sectionId: string) {
+    const [course, section] = await Promise.all([
       this.coursesService.findById(courseId),
       this.sectionsService.findById(sectionId),
-      this.prisma.lecture.findFirst({
-        where: {
-          sectionId,
-          order,
-          deletedAt: null,
-        },
-      }),
     ]);
 
     if (!course) {
@@ -157,17 +159,11 @@ export class LecturesService {
     }
 
     if (course.instructorId !== userId) {
-      throw new UnauthorizedException(`유닛 생성 권한이 없습니다. courseId: ${courseId}`);
+      throw new UnauthorizedException(`수업 생성 권한이 없습니다. courseId: ${courseId}`);
     }
 
     if (!section) {
       throw new NotFoundException(`섹션이 존재하지 않습니다. sectionId: ${sectionId}`);
-    }
-
-    if (duplicateOrderLecture) {
-      throw new BadRequestException(
-        `유닛 순서가 중복되었습니다. 순서를 다시 확인해주세요. order: ${order}`,
-      );
     }
   }
 }
