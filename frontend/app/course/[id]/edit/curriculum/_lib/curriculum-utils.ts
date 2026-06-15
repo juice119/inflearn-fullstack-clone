@@ -21,9 +21,3 @@ export function getSectionLectures(section: Section, lectures: Lecture[]) {
     .filter((lecture) => lecture.sectionId === section.id && !lecture.deletedAt)
     .sort((a, b) => a.order - b.order);
 }
-
-export function getNextLectureOrder(sectionLectures: Lecture[]) {
-  if (sectionLectures.length === 0) return 1;
-
-  return Math.max(...sectionLectures.map((lecture) => lecture.order)) + 1;
-}

@@ -257,32 +257,28 @@ export type UpdateCourseDto = {
 
 export type CreateLectureDto = {
     /**
-     * 유닛 제목
+     * 수업 제목
      */
     title: string;
     /**
-     * 유닛 설명
+     * 수업 설명
      */
     description: string;
-    /**
-     * 유닛 순서
-     */
-    order: number;
 };
 
 export type UpdateLectureDto = {
     /**
-     * 유닛 제목
+     * 수업 제목
      */
     title?: string;
     /**
-     * 유닛 설명
+     * 수업 설명
      */
     description?: string;
     /**
      * 강의 순서
      */
-    order?: number;
+    order: number;
 };
 
 export type CreateSectionDto = {
@@ -417,7 +413,7 @@ export type LecturesControllerDeleteData = {
     body?: never;
     path: {
         /**
-         * 유닛 ID
+         * 수업 ID
          */
         id: string;
     };
@@ -433,7 +429,7 @@ export type LecturesControllerFindOneData = {
     body?: never;
     path: {
         /**
-         * 유닛 ID
+         * 수업 ID
          */
         id: string;
     };
@@ -449,7 +445,7 @@ export type LecturesControllerUpdateData = {
     body: UpdateLectureDto;
     path: {
         /**
-         * 유닛 ID
+         * 수업 ID
          */
         id: string;
     };

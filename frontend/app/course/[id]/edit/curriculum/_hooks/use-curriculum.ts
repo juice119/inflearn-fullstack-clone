@@ -12,23 +12,21 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import {
-  DeleteTarget,
-  getActiveLectures,
-  getActiveSections,
-  getNextLectureOrder,
-  getSectionLectures,
-} from '../_lib/curriculum-utils';
+import { DeleteTarget, getActiveLectures, getActiveSections } from '../_lib/curriculum-utils';
 
 export function useCurriculum(initialCourse: Course) {
   const queryClient = useQueryClient();
+  const [hasMounted, setHasMounted] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [addLectureSection, setAddLectureSection] = useState<Section | null>(null);
   const [guideBarIndex, setGuideBarIndex] = useState<number | null>(null);
 
-  const courseQueryKey = ['course', initialCourse.id, 'sections,lectures'] as const;
+  const courseQueryKey = useMemo(
+    () => ['course', initialCourse.id, 'sections,lectures'] as const,
+    [initialCourse.id],
+  );
 
-  const { data: course = initialCourse } = useQuery<Course>({
+  const { data: queriedCourse } = useQuery<Course>({
     queryKey: courseQueryKey,
     queryFn: async () => {
       const { data, error } = await getCourseById(initialCourse.id, 'sections,lectures');
@@ -39,8 +37,16 @@ export function useCurriculum(initialCourse: Course) {
 
       return data;
     },
-    initialData: initialCourse,
+    enabled: hasMounted,
+    staleTime: 30_000,
   });
+
+  useEffect(() => {
+    queryClient.setQueryData(courseQueryKey, initialCourse);
+    setHasMounted(true);
+  }, [courseQueryKey, initialCourse, queryClient]);
+
+  const course = hasMounted ? (queriedCourse ?? initialCourse) : initialCourse;
 
   const sections = useMemo(() => getActiveSections(course?.sections), [course?.sections]);
   const lectures = useMemo(() => getActiveLectures(course?.lectures), [course?.lectures]);
@@ -127,19 +133,10 @@ export function useCurriculum(initialCourse: Course) {
   });
 
   const addLectureMutation = useMutation({
-    mutationFn: async ({
-      sectionId,
-      title,
-      order,
-    }: {
-      sectionId: string;
-      title: string;
-      order: number;
-    }) => {
+    mutationFn: async ({ sectionId, title }: { sectionId: string; title: string }) => {
       const { data, error } = await createLecture(course.id, sectionId, {
         title,
         description: '',
-        order,
       });
 
       if (error) {
@@ -235,12 +232,9 @@ export function useCurriculum(initialCourse: Course) {
       return;
     }
 
-    const sectionLectures = getSectionLectures(addLectureSection, lectures);
-
     addLectureMutation.mutate({
       sectionId: addLectureSection.id,
       title: trimmedTitle,
-      order: getNextLectureOrder(sectionLectures),
     });
   };
 
