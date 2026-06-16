@@ -1,5 +1,14 @@
 import { plainToInstance, Type } from 'class-transformer';
-import { IsIn, IsNumber, IsString, Max, Min, ValidateNested, validateSync } from 'class-validator';
+import {
+  IsIn,
+  IsNumber,
+  IsString,
+  IsUrl,
+  Max,
+  Min,
+  ValidateNested,
+  validateSync,
+} from 'class-validator';
 import { readFileSync } from 'fs';
 import yaml from 'js-yaml';
 import { join } from 'path';
@@ -21,6 +30,17 @@ class JwtConfig {
   authSecret: string;
 }
 
+class AwsConfig {
+  @IsString()
+  s3Region: string;
+
+  @IsString()
+  mediaFileBucketName: string;
+
+  @IsUrl({ protocols: ['http', 'https'], require_tld: false })
+  cloudFrontDomain: string;
+}
+
 export class AppConfig {
   @Type(() => DatabaseConfig)
   @ValidateNested()
@@ -33,6 +53,10 @@ export class AppConfig {
   @Type(() => Server)
   @ValidateNested()
   server: Server;
+
+  @Type(() => AwsConfig)
+  @ValidateNested()
+  aws: AwsConfig;
 
   @IsString()
   @IsIn(['local', 'development', 'production', 'test'])

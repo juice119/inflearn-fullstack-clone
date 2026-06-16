@@ -64,3 +64,6 @@ src/_gen/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# 환경 변수 파일
+enviorment/
