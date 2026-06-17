@@ -6,6 +6,7 @@ import { CoursesService } from 'src/courses/courses.service';
 import { CreateCourseDto } from 'src/courses/dto/CreateCourseDto';
 import { CreateLectureDto } from 'src/lectures/dto/CreateLecture.dto';
 import { UpdateLectureDto } from 'src/lectures/dto/UpdateLecture.dto';
+import { VideoStorageInfoDto } from 'src/lectures/dto/VideoStorageInfo.dto';
 import { LecturesService } from 'src/lectures/lectures.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateSectionDto } from 'src/sections/dto/CreateSection.dto';
@@ -77,12 +78,18 @@ export class TestDataHelper {
     title,
     description,
     order,
+    videoStorageInfo,
   }: Partial<UpdateLectureDto> = {}): UpdateLectureDto {
     const updateLectureDto = new UpdateLectureDto();
 
     updateLectureDto.title = title || '테스트 수업';
     updateLectureDto.description = description || '테스트 수업 설명';
     updateLectureDto.order = order || 1;
+    updateLectureDto.videoStorageInfo = new VideoStorageInfoDto();
+    updateLectureDto.videoStorageInfo.fileName = videoStorageInfo?.fileName || 'test.mp4';
+    updateLectureDto.videoStorageInfo.fileSize = videoStorageInfo?.fileSize || 1000;
+    updateLectureDto.videoStorageInfo.fileUrl =
+      videoStorageInfo?.fileUrl || 'https://example.com/test.mp4';
 
     return updateLectureDto;
   }

@@ -13,4 +13,12 @@ export class VideoStorageInfoDto {
   @ApiProperty({ description: '파일 URL', example: 'https://example.com/test.mp4' })
   @IsUrl()
   fileUrl: string;
+
+  toObject(): { fileName: string; fileSize: number; fileUrl: string } {
+    return {
+      fileName: this.fileName,
+      fileSize: this.fileSize,
+      fileUrl: this.fileUrl,
+    };
+  }
 }

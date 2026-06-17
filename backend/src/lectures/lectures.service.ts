@@ -4,7 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Lecture } from '@prisma/client';
+import { Lecture, Prisma } from '@prisma/client';
 import { CoursesService } from 'src/courses/courses.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SectionsService } from 'src/sections/sections.service';
@@ -73,13 +73,23 @@ export class LecturesService {
     updateLectureDto: UpdateLectureDto,
   ): Promise<Lecture> {
     await this.validateUpdateRule(userId, lectureId, updateLectureDto);
+    const data: Prisma.LectureUpdateInput = {};
+
+    if (updateLectureDto.title) {
+      data.title = updateLectureDto.title;
+    }
+    if (updateLectureDto.description) {
+      data.description = updateLectureDto.description;
+    }
+    if (updateLectureDto.order) {
+      data.order = updateLectureDto.order;
+    }
+    if (updateLectureDto.videoStorageInfo) {
+      data.videoStorageInfo = updateLectureDto.videoStorageInfo.toObject();
+    }
 
     return this.prisma.lecture.update({
-      data: {
-        title: updateLectureDto.title,
-        description: updateLectureDto.description,
-        order: updateLectureDto.order,
-      },
+      data,
       where: {
         id: lectureId,
         deletedAt: null,
