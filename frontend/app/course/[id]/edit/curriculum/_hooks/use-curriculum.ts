@@ -68,8 +68,8 @@ export function useCurriculum(initialCourse: Course) {
     });
   }, [sections.length]);
 
-  const invalidateCourse = () => {
-    void queryClient.invalidateQueries({ queryKey: courseQueryKey });
+  const invalidateCourse = async () => {
+    await queryClient.invalidateQueries({ queryKey: courseQueryKey });
   };
 
   const addSectionMutation = useMutation({
@@ -83,8 +83,8 @@ export function useCurriculum(initialCourse: Course) {
 
       return data;
     },
-    onSuccess: () => {
-      invalidateCourse();
+    onSuccess: async () => {
+      await invalidateCourse();
       setGuideBarIndex(sections.length);
       toast.success('섹션이 추가되었습니다.');
     },
@@ -101,8 +101,8 @@ export function useCurriculum(initialCourse: Course) {
 
       return data;
     },
-    onSuccess: () => {
-      invalidateCourse();
+    onSuccess: async () => {
+      await invalidateCourse();
       toast.success('섹션이 삭제되었습니다.');
     },
   });
@@ -129,8 +129,8 @@ export function useCurriculum(initialCourse: Course) {
 
       return data;
     },
-    onSuccess: () => {
-      invalidateCourse();
+    onSuccess: async () => {
+      await invalidateCourse();
     },
   });
 
@@ -148,8 +148,8 @@ export function useCurriculum(initialCourse: Course) {
 
       return data;
     },
-    onSuccess: () => {
-      invalidateCourse();
+    onSuccess: async () => {
+      await invalidateCourse();
       setAddLectureSection(null);
       toast.success('수업이 추가되었습니다.');
     },
@@ -166,8 +166,8 @@ export function useCurriculum(initialCourse: Course) {
 
       return data;
     },
-    onSuccess: () => {
-      invalidateCourse();
+    onSuccess: async () => {
+      await invalidateCourse();
       toast.success('유닛이 삭제되었습니다.');
     },
   });
@@ -281,6 +281,7 @@ export function useCurriculum(initialCourse: Course) {
     guideBarIndex,
     deleteTarget,
     addLectureSection,
+    invalidateCourse,
     addSection: handleAddSection,
     moveGuideBarUp: handleMoveGuideBarUp,
     moveGuideBarDown: handleMoveGuideBarDown,

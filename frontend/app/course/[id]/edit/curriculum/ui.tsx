@@ -40,6 +40,7 @@ function CurriculumContent() {
     cancelDelete,
     isDeletingSection,
     isDeletingLecture,
+    invalidateCourse,
     lecture: { editLecture, isEditLectureDialogOpen, setIsEditLectureDialogOpen, setEditLecture },
   } = useCurriculumContext();
 
@@ -84,9 +85,10 @@ function CurriculumContent() {
       {editLecture && (
         <EditLectureDialog
           isOpen={isEditLectureDialogOpen}
-          onClose={() => {
-            setEditLecture(undefined);
+          onClose={async () => {
+            await invalidateCourse();
             setIsEditLectureDialogOpen(false);
+            setEditLecture(undefined);
           }}
           lecture={editLecture}
         />

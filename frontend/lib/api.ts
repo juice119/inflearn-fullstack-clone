@@ -9,11 +9,13 @@ import {
   CreateLectureDto,
   lecturesControllerCreate,
   lecturesControllerDelete,
+  lecturesControllerUpdate,
   mediaControllerUpload,
   sectionsControllerCreate,
   sectionsControllerDelete,
   sectionsControllerUpdate,
   UpdateCourseDto,
+  UpdateLectureDto,
   UpdateSectionDto,
 } from '@/generated/openapi.ts';
 
@@ -139,6 +141,16 @@ export async function uploadMediaFile(file: File) {
     body: {
       file,
     },
+  });
+  return serializeApiResponse(response);
+}
+
+export async function updateLecture(lectureId: string, data: UpdateLectureDto) {
+  const response = await lecturesControllerUpdate({
+    path: {
+      id: lectureId,
+    },
+    body: data,
   });
   return serializeApiResponse(response);
 }

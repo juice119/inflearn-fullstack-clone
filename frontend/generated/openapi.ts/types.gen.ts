@@ -266,6 +266,21 @@ export type CreateLectureDto = {
     description: string;
 };
 
+export type VideoStorageInfoDto = {
+    /**
+     * 파일 이름
+     */
+    fileName: string;
+    /**
+     * 파일 크기
+     */
+    fileSize: number;
+    /**
+     * 파일 URL
+     */
+    fileUrl: string;
+};
+
 export type UpdateLectureDto = {
     /**
      * 수업 제목
@@ -278,7 +293,11 @@ export type UpdateLectureDto = {
     /**
      * 강의 순서
      */
-    order: number;
+    order?: number;
+    /**
+     * 비디오 정보
+     */
+    videoStorageInfo?: VideoStorageInfoDto;
 };
 
 export type CreateSectionDto = {

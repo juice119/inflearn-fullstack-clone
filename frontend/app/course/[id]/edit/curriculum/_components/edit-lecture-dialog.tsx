@@ -11,8 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lecture } from '@/generated/openapi.ts';
-import { uploadMediaFile } from '@/lib/api';
+import { Lecture, UpdateLectureDto } from '@/generated/openapi.ts';
+import { updateLecture, uploadMediaFile } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { FileVideo } from 'lucide-react';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
@@ -92,17 +92,31 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
     }, []),
   });
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    // TODO: API 연동 후 실제 저장 로직으로 교체
-    console.log('수업 편집 저장 (임시)', {
-      lectureId: lecture.id,
+    const body: UpdateLectureDto = {
       title: form.title,
       description: form.description,
-      videoStorageInfo: form.videoStorageInfo,
-    });
-    toast.info('저장 기능은 준비 중입니다.');
+      order: lecture.order,
+    };
+
+    if (form.videoStorageInfo) {
+      body.videoStorageInfo = {
+        fileName: form.videoStorageInfo.fileName,
+        fileSize: form.videoStorageInfo.fileSize,
+        fileUrl: form.videoStorageInfo.fileUrl,
+      };
+    }
+
+    const { data, error } = await updateLecture(lecture.id, body);
+
+    if (error || !data) {
+      toast.error(error?.message || '수업 저장을 실패하였습니다.');
+      return;
+    }
+    if (data) {
+      toast.success('📝 수업 저장이 완료되었습니다.');
+    }
     onClose();
   };
 
