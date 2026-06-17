@@ -9,6 +9,7 @@ import {
   CreateLectureDto,
   lecturesControllerCreate,
   lecturesControllerDelete,
+  mediaControllerUpload,
   sectionsControllerCreate,
   sectionsControllerDelete,
   sectionsControllerUpdate,
@@ -128,6 +129,15 @@ export async function deleteLecture(lectureId: string) {
   const response = await lecturesControllerDelete({
     path: {
       id: lectureId,
+    },
+  });
+  return serializeApiResponse(response);
+}
+
+export async function uploadMediaFile(file: File) {
+  const response = await mediaControllerUpload({
+    body: {
+      file,
     },
   });
   return serializeApiResponse(response);

@@ -10,6 +10,7 @@ import { ApiBody, ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import { JwtAuth } from 'src/common/decorators/JwtAuth.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { JwtUserPayLoad } from 'src/common/JwtUserPayLoad';
+import { MediaUploadResponseDto } from './dto/mediaUploadResponse.dto';
 import { MediaService } from './media.service';
 
 const MAX_FILE_SIZE = 300 * 1024 * 1024;
@@ -36,20 +37,28 @@ export class MediaController {
       },
     },
   })
-  @ApiOkResponse({ description: '파일 업로드 성공', type: 'string' })
+  @ApiOkResponse({ description: '파일 업로드 성공', type: MediaUploadResponseDto })
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @User() user: JwtUserPayLoad,
-  ): Promise<string> {
+  ): Promise<MediaUploadResponseDto> {
+    const now = new Date();
+
     if (!file || !file.originalname || !file.buffer) {
       throw new BadRequestException('파일이 없습니다.');
     }
-
-    return await this.mediaService.uploadMediaFile(
+    const fileUrl = await this.mediaService.uploadMediaFile(
       file.originalname,
       file.buffer,
       user.id,
-      new Date(),
+      now,
     );
+
+    return new MediaUploadResponseDto({
+      originalFileName: file.originalname,
+      fileSize: file.size,
+      contentType: file.mimetype,
+      fileUrl,
+    });
   }
 }

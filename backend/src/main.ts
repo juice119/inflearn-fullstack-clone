@@ -1,4 +1,5 @@
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AppConfig } from './common/config/AplicationConfig';
@@ -6,6 +7,15 @@ import { AppConfig } from './common/config/AplicationConfig';
 async function bootstrap() {
   const appConfig = AppConfig.ofYml(process.env.NODE_ENV || '');
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector), {
+      excludeExtraneousValues: true,
+      enableImplicitConversion: false,
+      exposeUnsetFields: false,
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Inflearn API 문서')

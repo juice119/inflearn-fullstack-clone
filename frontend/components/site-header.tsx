@@ -11,10 +11,7 @@ import { usePathname } from 'next/navigation';
 
 export default function SiteHeader({ categories }: { categories: CourseCategory[] }) {
   const pathname = usePathname();
-  const isSiteHeaderNeeded = !pathname.includes('/course/');
-  const isCategoryNeeded = pathname == '/' || pathname.includes('/courses');
-
-  if (isSiteHeaderNeeded) return null;
+  const isCategoryNeeded = pathname === '/' || pathname.includes('/courses');
 
   return (
     <header className="site-header w-full border-b bg-white">

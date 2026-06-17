@@ -12,12 +12,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lecture } from '@/generated/openapi.ts';
+import { uploadMediaFile } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import { Upload } from 'lucide-react';
-import { FormEvent, useEffect, useState } from 'react';
+import { FileVideo } from 'lucide-react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'sonner';
-import { MAX_LECTURE_TITLE_LENGTH } from '../_lib/curriculum-utils';
+import {
+  MAX_LECTURE_TITLE_LENGTH,
+  parseVideoStorageInfo,
+  type VideoStorageInfo,
+} from '../_lib/curriculum-utils';
 
 const MAX_VIDEO_SIZE = 300 * 1024 * 1024;
 const ALLOWED_VIDEO_ACCEPT = {
@@ -29,6 +34,12 @@ const ALLOWED_VIDEO_ACCEPT = {
 const sectionLabelClass = 'text-[14px] font-semibold leading-none text-[#212529]';
 const fieldBorderClass = 'border-[#DEE2E6]';
 
+type EditLectureForm = {
+  title: string;
+  description: string;
+  videoStorageInfo: VideoStorageInfo | null;
+};
+
 type EditLectureDialogProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -36,12 +47,18 @@ type EditLectureDialogProps = {
 };
 
 export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialogProps) {
-  const [title, setTitle] = useState(lecture.title);
-  const [description, setDescription] = useState(lecture.description ?? '');
+  const [form, setSetForm] = useState<EditLectureForm>({
+    title: lecture.title,
+    description: lecture.description ?? '',
+    videoStorageInfo: parseVideoStorageInfo(lecture.videoStorageInfo),
+  });
 
   useEffect(() => {
-    setTitle(lecture.title);
-    setDescription(lecture.description ?? '');
+    setSetForm({
+      title: lecture.title,
+      description: lecture.description ?? '',
+      videoStorageInfo: parseVideoStorageInfo(lecture.videoStorageInfo),
+    });
   }, [lecture]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -49,8 +66,30 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
     maxSize: MAX_VIDEO_SIZE,
     maxFiles: 1,
     multiple: false,
-    onDropAccepted: () => {},
-    onDropRejected: () => {},
+    onDrop: useCallback(async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+
+      if (!file) return;
+
+      const response = await uploadMediaFile(file);
+
+      if (response.error || !response.data) {
+        toast.error(response.error?.message || '파일 업로드를 실패하였습니다.');
+        return;
+      }
+
+      const uploadData = response.data;
+
+      setSetForm((prev) => ({
+        ...prev,
+        videoStorageInfo: {
+          fileName: uploadData.originalFileName,
+          fileSize: uploadData.fileSize,
+          contentType: uploadData.contentType,
+          fileUrl: uploadData.fileUrl,
+        },
+      }));
+    }, []),
   });
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -59,8 +98,9 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
     // TODO: API 연동 후 실제 저장 로직으로 교체
     console.log('수업 편집 저장 (임시)', {
       lectureId: lecture.id,
-      title,
-      description,
+      title: form.title,
+      description: form.description,
+      videoStorageInfo: form.videoStorageInfo,
     });
     toast.info('저장 기능은 준비 중입니다.');
     onClose();
@@ -89,10 +129,14 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
               </Label>
               <Input
                 id="edit-lecture-title"
-                value={title}
-                onChange={(event) =>
-                  setTitle(event.target.value.slice(0, MAX_LECTURE_TITLE_LENGTH))
-                }
+                value={form.title}
+                onChange={(event) => {
+                  event.preventDefault();
+                  setSetForm((prev) => ({
+                    ...prev,
+                    title: event.target.value.slice(0, MAX_LECTURE_TITLE_LENGTH),
+                  }));
+                }}
                 maxLength={MAX_LECTURE_TITLE_LENGTH}
                 className={cn(
                   'h-10 rounded-lg bg-white px-3 text-[15px] text-[#212529] shadow-none',
@@ -110,6 +154,12 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
                 </span>
               </div>
 
+              {form.videoStorageInfo && (
+                <div className="w-full h-auto min-h-[200px]">
+                  <video autoPlay={true} controls={true} src={form.videoStorageInfo.fileUrl} />
+                </div>
+              )}
+
               <div
                 {...getRootProps()}
                 className={cn(
@@ -119,11 +169,16 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
                 )}
               >
                 <input {...getInputProps()} />
-                <Upload className="mb-4 size-8 text-[#ADB5BD]" />
-                <p className="text-[15px] font-semibold text-[#212529]">영상 파일 선택</p>
-                <p className="mt-1.5 text-[13px] text-[#868E96]">
-                  업로드할 동영상 파일을 드래그 앤 드롭하세요
-                </p>
+                <div className="py-8">
+                  <FileVideo className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-sm text-gray-600">
+                    {form.videoStorageInfo
+                      ? `선택된 파일: ${form.videoStorageInfo.fileName}`
+                      : isDragActive
+                        ? '파일을 여기에 놓아주세요'
+                        : '클릭하거나 파일을 드래그하여 업로드하세요'}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -139,7 +194,16 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
                 )}
               >
                 {isOpen && (
-                  <CKEditor key={lecture.id} value={description} onChange={setDescription} />
+                  <CKEditor
+                    key={lecture.id}
+                    value={form.description}
+                    onChange={(value) =>
+                      setSetForm((prev) => ({
+                        ...prev,
+                        description: value,
+                      }))
+                    }
+                  />
                 )}
               </div>
             </div>
@@ -161,7 +225,7 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
           <Button
             type="submit"
             form="edit-lecture-form"
-            disabled={!title.trim()}
+            disabled={!form.title.trim()}
             className="h-10 min-w-[72px] rounded-lg border-0 bg-[#00C471] px-5 text-[14px] font-semibold text-white shadow-none hover:bg-[#00B068] disabled:bg-[#ADB5BD] disabled:text-white"
           >
             저장

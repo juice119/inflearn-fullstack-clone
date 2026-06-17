@@ -299,6 +299,25 @@ export type UpdateSectionDto = {
     description: string;
 };
 
+export type MediaUploadResponseDto = {
+    /**
+     * 원본 파일명
+     */
+    originalFileName: string;
+    /**
+     * 파일 크기 (bytes)
+     */
+    fileSize: number;
+    /**
+     * 컨텐츠 타입
+     */
+    contentType: string;
+    /**
+     * 업로드된 파일 URL
+     */
+    fileUrl: string;
+};
+
 export type AppControllerHcData = {
     body?: never;
     path?: never;
@@ -547,3 +566,24 @@ export type CategoriesControllerFindAllResponses = {
 };
 
 export type CategoriesControllerFindAllResponse = CategoriesControllerFindAllResponses[keyof CategoriesControllerFindAllResponses];
+
+export type MediaControllerUploadData = {
+    body: {
+        /**
+         * 이미지, 비디오 파일
+         */
+        file?: Blob | File;
+    };
+    path?: never;
+    query?: never;
+    url: '/media';
+};
+
+export type MediaControllerUploadResponses = {
+    /**
+     * 파일 업로드 성공
+     */
+    200: MediaUploadResponseDto;
+};
+
+export type MediaControllerUploadResponse = MediaControllerUploadResponses[keyof MediaControllerUploadResponses];
