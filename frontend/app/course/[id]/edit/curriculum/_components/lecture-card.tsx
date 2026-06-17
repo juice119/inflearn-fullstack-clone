@@ -13,7 +13,11 @@ type LectureCardProps = {
 };
 
 export function LectureCard({ lecture, index }: LectureCardProps) {
-  const { requestDeleteLecture, isDeletingLecture } = useCurriculumContext();
+  const {
+    requestDeleteLecture,
+    isDeletingLecture,
+    lecture: { setEditLecture, setIsEditLectureDialogOpen: setEditLectureDialogOpen },
+  } = useCurriculumContext();
 
   return (
     <Item variant="outline" size="sm">
@@ -29,11 +33,18 @@ export function LectureCard({ lecture, index }: LectureCardProps) {
       <ItemActions>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button type="button" variant="ghost" size="icon-sm">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => {
+                setEditLecture(lecture);
+                setEditLectureDialogOpen(true);
+              }}
+            >
               <Pencil className="size-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>수업 수정 (준비 중)</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>

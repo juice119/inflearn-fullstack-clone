@@ -1,6 +1,6 @@
 'use client';
 
-import { Course, Section } from '@/generated/openapi.ts';
+import { Course, Lecture, Section } from '@/generated/openapi.ts';
 import {
   createLecture,
   createSection,
@@ -20,6 +20,8 @@ export function useCurriculum(initialCourse: Course) {
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [addLectureSection, setAddLectureSection] = useState<Section | null>(null);
   const [guideBarIndex, setGuideBarIndex] = useState<number | null>(null);
+  const [editLecture, setEditLecture] = useState<Lecture>();
+  const [isEditLectureDialogOpen, setIsEditLectureDialogOpen] = useState(false);
 
   const courseQueryKey = useMemo(
     () => ['course', initialCourse.id, 'sections,lectures'] as const,
@@ -296,5 +298,11 @@ export function useCurriculum(initialCourse: Course) {
     isUpdatingSection: updateSectionMutation.isPending,
     isDeletingSection: deleteSectionMutation.isPending,
     isDeletingLecture: deleteLectureMutation.isPending,
+    lecture: {
+      editLecture,
+      setEditLecture,
+      isEditLectureDialogOpen,
+      setIsEditLectureDialogOpen,
+    },
   };
 }

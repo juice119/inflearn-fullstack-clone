@@ -5,6 +5,7 @@ import { Course } from '@/generated/openapi.ts';
 import { AddLectureDialog } from './_components/add-lecture-dialog';
 import { CurriculumEmptyState } from './_components/curriculum-empty-state';
 import { DeleteConfirmDialog } from './_components/delete-confirm-dialog';
+import { EditLectureDialog } from './_components/edit-lecture-dialog';
 import { SectionCard } from './_components/section-card';
 import { SectionToolbar } from './_components/section-toolbar';
 import { CurriculumProvider, useCurriculumContext } from './_context/curriculum-context';
@@ -39,6 +40,7 @@ function CurriculumContent() {
     cancelDelete,
     isDeletingSection,
     isDeletingLecture,
+    lecture: { editLecture, isEditLectureDialogOpen, setIsEditLectureDialogOpen, setEditLecture },
   } = useCurriculumContext();
 
   const deleteDialogMessage = deleteTarget
@@ -50,7 +52,6 @@ function CurriculumContent() {
       <div className="mb-8">
         <h1 className="text-[22px] font-bold text-foreground">커리큘럼</h1>
       </div>
-
       {sections.length === 0 ? (
         <CurriculumEmptyState />
       ) : (
@@ -68,9 +69,7 @@ function CurriculumContent() {
           ))}
         </div>
       )}
-
       <AddLectureDialog />
-
       {deleteTarget && (
         <DeleteConfirmDialog
           title={deleteDialogMessage.title}
@@ -80,6 +79,16 @@ function CurriculumContent() {
           }}
           onConfirm={confirmDelete}
           isPending={isDeletingSection || isDeletingLecture}
+        />
+      )}
+      {editLecture && (
+        <EditLectureDialog
+          isOpen={isEditLectureDialogOpen}
+          onClose={() => {
+            setEditLecture(undefined);
+            setIsEditLectureDialogOpen(false);
+          }}
+          lecture={editLecture}
         />
       )}
     </div>
