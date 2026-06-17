@@ -2,6 +2,7 @@ import { plainToInstance, Type } from 'class-transformer';
 import {
   IsIn,
   IsNumber,
+  IsOptional,
   IsString,
   IsUrl,
   Max,
@@ -39,6 +40,10 @@ class AwsConfig {
 
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   cloudFrontDomain: string;
+
+  @IsOptional()
+  @IsString()
+  profile?: string;
 }
 
 export class AppConfig {
@@ -90,5 +95,9 @@ export class AppConfig {
     }
 
     return this.server.port;
+  }
+
+  get hasAwsProfile(): boolean {
+    return this.aws.profile !== undefined;
   }
 }

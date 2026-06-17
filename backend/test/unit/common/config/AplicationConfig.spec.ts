@@ -116,6 +116,102 @@ describe('AppConfig', () => {
         expect(errors[0].children?.[0].constraints).toHaveProperty('isNumber');
       });
     });
+
+    describe('aws', () => {
+      it('s3Region이 문자열이 아니면 에러가 발생한다.', () => {
+        // given
+        const config = plainToInstance(AppConfig, createValdateConfigObject());
+        const unValdatedData = 123;
+        config.aws.s3Region = unValdatedData as unknown as string;
+
+        // when
+        const errors = validateSync(config);
+
+        // then
+        expect(errors).toHaveLength(1);
+        expect(errors[0].children?.[0].property).toBe('s3Region');
+        expect(errors[0].children?.[0].value).toBe(unValdatedData);
+        expect(errors[0].children?.[0].constraints).toHaveProperty('isString');
+      });
+
+      it('mediaFileBucketName이 문자열이 아니면 에러가 발생한다.', () => {
+        // given
+        const config = plainToInstance(AppConfig, createValdateConfigObject());
+        const unValdatedData = 123;
+        config.aws.mediaFileBucketName = unValdatedData as unknown as string;
+
+        // when
+        const errors = validateSync(config);
+
+        // then
+        expect(errors).toHaveLength(1);
+        expect(errors[0].children?.[0].property).toBe('mediaFileBucketName');
+        expect(errors[0].children?.[0].value).toBe(unValdatedData);
+        expect(errors[0].children?.[0].constraints).toHaveProperty('isString');
+      });
+
+      it('cloudFrontDomain이 유효한 URL이 아니면 에러가 발생한다.', () => {
+        // given
+        const config = plainToInstance(AppConfig, createValdateConfigObject());
+        const unValdatedData = 'ftp://localhost';
+        config.aws.cloudFrontDomain = unValdatedData;
+
+        // when
+        const errors = validateSync(config);
+
+        // then
+        expect(errors).toHaveLength(1);
+        expect(errors[0].children?.[0].property).toBe('cloudFrontDomain');
+        expect(errors[0].children?.[0].value).toBe(unValdatedData);
+        expect(errors[0].children?.[0].constraints).toHaveProperty('isUrl');
+      });
+
+      it('profile이 문자열이 아니면 에러가 발생한다.', () => {
+        // given
+        const config = plainToInstance(AppConfig, createValdateConfigObject());
+        const unValdatedData = 123;
+        config.aws.profile = unValdatedData as unknown as string;
+
+        // when
+        const errors = validateSync(config);
+
+        // then
+        expect(errors).toHaveLength(1);
+        expect(errors[0].children?.[0].property).toBe('profile');
+        expect(errors[0].children?.[0].value).toBe(unValdatedData);
+        expect(errors[0].children?.[0].constraints).toHaveProperty('isString');
+      });
+    });
+  });
+
+  describe('hasAwsProfile', () => {
+    it('profile이 설정되어 있으면 true를 반환한다.', () => {
+      // given
+      const config = plainToInstance(AppConfig, {
+        ...createValdateConfigObject(),
+        aws: {
+          ...createValdateConfigObject().aws!,
+          profile: 'my-aws-profile',
+        },
+      });
+
+      // when
+      const hasAwsProfile = config.hasAwsProfile;
+
+      // then
+      expect(hasAwsProfile).toBe(true);
+    });
+
+    it('profile이 없으면 false를 반환한다.', () => {
+      // given
+      const config = plainToInstance(AppConfig, createValdateConfigObject());
+
+      // when
+      const hasAwsProfile = config.hasAwsProfile;
+
+      // then
+      expect(hasAwsProfile).toBe(false);
+    });
   });
 
   describe('listenPort', () => {
@@ -152,13 +248,18 @@ describe('AppConfig', () => {
   });
 });
 
-function createValdateConfigObject(): Required<AppConfig> {
+function createValdateConfigObject(): Partial<AppConfig> {
   return {
     database: {
       url: 'postgresql://prisma:prismapass@localhost:5432/inflearn_clone?schema=public',
     },
     jwt: { authSecret: 'sd' },
     server: { port: 8000 },
+    aws: {
+      s3Region: 'ap-northeast-2',
+      mediaFileBucketName: 'test-media-bucket',
+      cloudFrontDomain: 'https://localhost',
+    },
     enviroment: 'local',
   };
 }

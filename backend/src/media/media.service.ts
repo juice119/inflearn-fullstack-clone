@@ -1,4 +1,5 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client, S3ClientConfig } from '@aws-sdk/client-s3';
+import { fromLoginCredentials } from '@aws-sdk/credential-providers';
 import { Injectable } from '@nestjs/common';
 import path from 'path';
 import { AppConfig } from 'src/common/config/AplicationConfig';
@@ -19,10 +20,16 @@ export class MediaService {
   }
 
   static of(appConfig: AppConfig): MediaService {
+    const s3ClientConfig: S3ClientConfig = {
+      region: appConfig.aws.s3Region,
+    };
+
+    if (appConfig.hasAwsProfile) {
+      s3ClientConfig.credentials = fromLoginCredentials({ profile: appConfig.aws.profile });
+    }
+
     return new MediaService(
-      new S3Client({
-        region: appConfig.aws.s3Region,
-      }),
+      new S3Client(s3ClientConfig),
       appConfig.aws.cloudFrontDomain,
       appConfig.aws.mediaFileBucketName,
     );
