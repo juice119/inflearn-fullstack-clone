@@ -36,6 +36,14 @@ describe('CategoriesService', () => {
   });
 
   describe('findAll', () => {
+    it('카테고리가 없으면 빈 배열을 반환한다.', async () => {
+      // when
+      const categories = await service.findAll();
+
+      // then
+      expect(categories).toEqual([]);
+    });
+
     it('모든 카테고리를 조회한다.', async () => {
       // given
       const category = await testDataHelper.createCategory();

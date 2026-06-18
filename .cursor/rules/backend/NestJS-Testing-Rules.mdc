@@ -27,9 +27,11 @@ Strictly enforce the following testing architecture and conventions. No exceptio
 
 - **Language**: All `describe` and `it` block text MUST be written in **Korean**.
 - **AAA Pattern**: Explicitly structure every test case with `// given`, `// when`, and `// then` comments.
-- **Sanitization**: Always call `vi.clearAllMocks();` inside the `afterEach` hook to prevent test pollution.
+- **Sanitization**: Call `vi.clearAllMocks();` in `afterEach` **only when** mocks are used (`vi.fn()`, `vi.spyOn()`, etc.) to prevent cross-test pollution. Do NOT call it in tests without mocks (e.g., DB-backed integration tests).
 
 ## 4. Blueprint Template
+
+### With mocks
 
 ```typescript
 describe("TargetClass", () => {
@@ -37,6 +39,27 @@ describe("TargetClass", () => {
     vi.clearAllMocks();
   });
 
+  describe("methodName", () => {
+    it("조건에 맞는 명확한 한글 설명 기재", () => {
+      // given
+      const mockFn = vi.fn();
+      const sampleData = { id: 1 };
+
+      // when
+      const result = TargetClass.methodName(sampleData, mockFn);
+
+      // then
+      expect(result).toBeDefined();
+      expect(mockFn).toHaveBeenCalled();
+    });
+  });
+});
+```
+
+### Without mocks (integration / E2E tests)
+
+```typescript
+describe("TargetClass", () => {
   describe("methodName", () => {
     it("조건에 맞는 명확한 한글 설명 기재", () => {
       // given
