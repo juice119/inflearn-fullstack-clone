@@ -1,0 +1,203 @@
+---
+description: NestJS DTO naming, structure, and layer conventions
+globs: backend/src/**/dto/**/*.dto.ts
+alwaysApply: false
+---
+
+Strictly enforce the following DTO conventions. No exceptions.
+
+## 1. Location & File Naming
+
+- All DTOs live in `src/{feature}/dto/`.
+- File extension is always `*.dto.ts`.
+- File names use **PascalCase** (e.g., `CreateCourseRequest.dto.ts`).
+- Class names match the file name with a `Dto` suffix (e.g., `CreateCourseRequestDto`).
+
+## 2. UseCase Prefix (Verb + DomainName)
+
+DTO names follow `{UseCase}{LayerSuffix}`.
+
+- **UseCase** = `{Verb}{DomainName}`. `Create`, `Update`, `Delete` prefixes are allowed.
+- UseCase prefix must match the **method that consumes the DTO** (e.g., `createCourse()` → `CreateCourseRequestDto`).
+
+```
+createCourse()   → CreateCourseRequestDto, CreateCourseCommandDto, ...
+updateCourse()   → UpdateCourseRequestDto, UpdateCourseCommandDto, ...
+findAllCourses() → FindAllCoursesQueryDto, FindAllCoursesCommandDto, ...
+```
+
+## 3. Layer Suffixes (No Overlap)
+
+Each suffix belongs to exactly one layer. **Never reuse the same suffix across layers.**
+
+| Layer      | Input              | Output     |
+| ---------- | ------------------ | ---------- |
+| Controller | `Request`, `Query` | `Response` |
+| Service    | `Command`          | `Result`   |
+| Repository | `Params`           | `Record`   |
+
+```
+CreateCourseRequest.dto.ts   → HTTP body
+FindAllCoursesQuery.dto.ts   → HTTP query string
+CreateCourseResponse.dto.ts  → HTTP response
+CreateCourseCommand.dto.ts   → Service input
+CreateCourseResult.dto.ts    → Service output
+CreateCourseParams.dto.ts    → Repository input
+CreateCourseRecord.dto.ts    → Repository output
+```
+
+## 4. Layer Boundaries
+
+### Default
+
+- Service methods accept a `Command` DTO as input.
+- Controllers must **never** return `Record` DTOs. Always map to `Response`.
+
+### Exception — skip `Command` mapping
+
+To reduce DTO duplication, a Controller may pass `Request` / `Query` DTOs directly to Service **only when all** of the following are true:
+
+1. `Request` / `Query` fields are **identical** to the HTTP-derived fields a `Command` DTO would hold (no extra fields, merging, or structural changes).
+2. Values required by Service but absent from the HTTP DTO are passed as **separate arguments**. At most **3** such arguments.
+
+```typescript
+// ✅ HTTP fields in Request; userId, now, accountId as separate args — Command optional
+create(userId, now, accountId, createCourseRequestDto);
+findAll(instructorId, findAllCoursesQueryDto);
+```
+
+If any condition fails (4+ extra arguments, field merging, structural changes), map to a `Command` DTO.
+
+## 5. Field Style & Decorators
+
+### Request / Query (Controller input)
+
+- Use **`public readonly` fields** (`ValidationPipe({ transform: true })` converts plain object → instance, then validates).
+- Apply decorators on **fields**:
+  - `@ApiProperty({ type, description, example, required })`
+  - `class-validator` (`@IsString`, `@IsOptional`, etc.)
+  - `@Transform` — coerce incoming values to the declared field type (see below)
+- Do **NOT** use `@Expose()`.
+
+### Transform (Request / Query)
+
+HTTP payloads (especially query strings) often arrive as strings. Apply `@Transform` during `plainToInstance`, **before** `class-validator` runs.
+
+- **Primitives** (`number`, `boolean`, `Date`, etc.): `@Transform` is **required**.
+- **Arrays**: normalize single values, `undefined`, and empty input to the expected array shape.
+- **Strings**: add `@Transform` when normalization is needed (`trim`, empty string → `undefined`).
+- **Nested DTOs / arrays**: use `@Type(() => NestedDto)` with `@ValidateNested()`.
+
+```typescript
+@Transform(({ value }) => parseInt(value, 10))
+@IsInt()
+readonly page: number;
+
+@Transform(({ value }: { value: string[] | string | undefined }) =>
+  value === undefined ? [] : Array.isArray(value) ? value : [value],
+)
+@IsArray()
+readonly categoryIds: string[];
+```
+
+### Response / Command / Result / Params / Record
+
+- Use **`private readonly` fields + getters** (immutable value object).
+- Provide a constructor (object argument) or `static from()` factory.
+- Apply decorators on **getters**:
+  - `@ApiProperty({ type, description, example, required })` — required on `Response`; optional on internal DTOs
+  - `@Expose()` — **required on `Response` getters only** (`ClassSerializerInterceptor` + `excludeExtraneousValues: true`)
+
+### Nested & Collections
+
+- Nested objects: `type: () => NestedDto`
+- Arrays: `isArray: true` or `type: [String]`
+- Optional fields: `@IsOptional()` + `@ApiProperty({ required: false })`
+
+## 6. Blueprint
+
+### Request
+
+```typescript
+export class CreateCourseRequestDto {
+  @ApiProperty({ type: String, description: '강의 제목', example: 'NestJS 마스터', required: true })
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  @IsString()
+  readonly title: string;
+
+  @ApiProperty({
+    description: '강의 카테고리 ID 목록',
+    example: ['9f586aad-07d5-47c6-92df-8e6f1a8bb974'],
+    type: [String],
+  })
+  @Transform(({ value }: { value: string[] | undefined }) => value ?? [])
+  @IsArray()
+  @IsUUID('all', { each: true })
+  readonly categoryIds: string[];
+}
+```
+
+### Query
+
+```typescript
+export class FindAllCoursesQueryDto {
+  @ApiProperty({ type: Number, description: '페이지 번호', example: 1, required: false })
+  @Transform(({ value }) => parseInt(value, 10))
+  @IsOptional()
+  @IsInt()
+  readonly page: number;
+}
+```
+
+### Response
+
+```typescript
+export class CreateCourseResponseDto {
+  private readonly _id: string;
+  private readonly _title: string;
+
+  constructor({ id, title }: { id: string; title: string }) {
+    this._id = id;
+    this._title = title;
+  }
+
+  @Expose()
+  @ApiProperty({ type: String, description: '강의 ID', example: 'uuid', required: true })
+  get id(): string {
+    return this._id;
+  }
+
+  @Expose()
+  @ApiProperty({ type: String, description: '강의 제목', example: 'NestJS 마스터', required: true })
+  get title(): string {
+    return this._title;
+  }
+
+  static from(record: CreateCourseRecordDto): CreateCourseResponseDto {
+    return new CreateCourseResponseDto({ id: record.id, title: record.title });
+  }
+}
+```
+
+## 7. Data Flow
+
+### Default (with `Command`)
+
+```
+CreateCourseRequestDto
+  → CreateCourseCommandDto
+    → CreateCourseParamsDto
+      → CreateCourseRecordDto
+        → CreateCourseResultDto
+          → CreateCourseResponseDto
+```
+
+### Exception (skip `Command`)
+
+```
+CreateCourseRequestDto + separate args (≤3)
+  → CreateCourseParamsDto
+    → CreateCourseRecordDto
+      → CreateCourseResultDto
+        → CreateCourseResponseDto
+```
