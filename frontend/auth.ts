@@ -1,10 +1,11 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@/prisma';
-import { comparePassword } from './lib/password-utils';
+import { PrismaAdapter } from '@auth/prisma-adapter';
 import * as jwt from 'jsonwebtoken';
+import NextAuth from 'next-auth';
 import { JWT } from 'next-auth/jwt';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { User } from './generated/openapi.ts';
+import { comparePassword } from './lib/password-utils';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   jwt: {
@@ -33,7 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           type: 'password',
         },
       },
-      async authorize(credentials) {
+      async authorize(credentials): Promise<User | null> {
         if (!credentials || !credentials.email || !credentials.password) {
           throw new Error('이메일과 비밀번호를 입력해주세요.');
         }
@@ -53,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if (!matchedPassword) throw new Error('비밀 번호가 일치하지 않습니다.');
 
-        return user;
+        return user as User;
       },
     }),
   ],

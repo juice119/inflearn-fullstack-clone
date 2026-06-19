@@ -20,7 +20,7 @@ export default async function EditCourseLayout({
   return (
     <div className="w-full h-full bg-[#F1F3F5]">
       <EditCourseHeader courseId={id} title={course.data.title} status={course.data.status} />
-      <div className="flex min-h-screen gap-12 p-12">
+      <div className="grid min-h-screen grid-cols-[minmax(187px,calc(50%-392px))_704px_auto] px-12 pb-40 pt-8 gap-10 max-w-[1440px] my-0 mx-auto">
         <EditCourseSidebar />
         <div className="min-w-0 flex-1">{children}</div>
       </div>

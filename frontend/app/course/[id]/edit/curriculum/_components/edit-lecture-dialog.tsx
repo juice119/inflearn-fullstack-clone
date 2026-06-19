@@ -1,6 +1,6 @@
 'use client';
 
-import CKEditor from '@/components/ckeditor';
+import CKEditorLazy from '@/components/ckeditor-lazy';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -47,14 +47,14 @@ type EditLectureDialogProps = {
 };
 
 export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialogProps) {
-  const [form, setSetForm] = useState<EditLectureForm>({
+  const [form, setForm] = useState<EditLectureForm>({
     title: lecture.title,
     description: lecture.description ?? '',
     videoStorageInfo: parseVideoStorageInfo(lecture.videoStorageInfo),
   });
 
   useEffect(() => {
-    setSetForm({
+    setForm({
       title: lecture.title,
       description: lecture.description ?? '',
       videoStorageInfo: parseVideoStorageInfo(lecture.videoStorageInfo),
@@ -80,7 +80,7 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
 
       const uploadData = response.data;
 
-      setSetForm((prev) => ({
+      setForm((prev) => ({
         ...prev,
         videoStorageInfo: {
           fileName: uploadData.originalFileName,
@@ -114,9 +114,8 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
       toast.error(error?.message || '수업 저장을 실패하였습니다.');
       return;
     }
-    if (data) {
-      toast.success('📝 수업 저장이 완료되었습니다.');
-    }
+
+    toast.success('📝 수업 저장이 완료되었습니다.');
     onClose();
   };
 
@@ -146,7 +145,7 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
                 value={form.title}
                 onChange={(event) => {
                   event.preventDefault();
-                  setSetForm((prev) => ({
+                  setForm((prev) => ({
                     ...prev,
                     title: event.target.value.slice(0, MAX_LECTURE_TITLE_LENGTH),
                   }));
@@ -203,16 +202,16 @@ export function EditLectureDialog({ isOpen, onClose, lecture }: EditLectureDialo
                 className={cn(
                   'overflow-hidden rounded-lg border bg-white',
                   fieldBorderClass,
-                  '[&_.ck-editor-container>div]:rounded-none [&_.ck-editor-container>div]:border-0 [&_.ck-editor-container>div]:p-0',
+                  '[&_.ck-editor__main]:min-h-[400px]',
                   '[&_.ck-content]:text-[14px] [&_.ck-content]:text-[#495057]',
                 )}
               >
                 {isOpen && (
-                  <CKEditor
+                  <CKEditorLazy
                     key={lecture.id}
                     value={form.description}
                     onChange={(value) =>
-                      setSetForm((prev) => ({
+                      setForm((prev) => ({
                         ...prev,
                         description: value,
                       }))
