@@ -6,7 +6,7 @@ import { AppConfig } from './AplicationConfig';
   providers: [
     {
       provide: AppConfig,
-      useFactory: () => AppConfig.ofYml(),
+      useFactory: () => AppConfig.ofYml(process.env.NODE_ENV || 'local'),
     },
   ],
   exports: [AppConfig],

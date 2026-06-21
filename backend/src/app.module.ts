@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { SectionsModule } from './sections/sections.module';
 import { CategoriesModule } from './categories/categories.module';
 import { MediaModule } from './media/media.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MediaModule } from './media/media.module';
     SectionsModule,
     CategoriesModule,
     MediaModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [],
