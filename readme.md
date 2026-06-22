@@ -113,30 +113,18 @@ pnpm openapi-ts
 
 ## 주요 기능
 
-### 구현 완료
+- 회원가입 / 로그인
+- 프로필 수정
+- 강의 리스트 및 조회
+- 강의 상세 페이지
+- 학습 페이지 (수업 강의 시청 및 이어보기)
+- 강의 생성 및 수정
+- 커리큘럼 관리 (강의 - 섹션 - 수업)
+- 지식공유자 강의 목록
 
-- 회원가입 / 로그인 (NextAuth Credentials)
-- 강의 생성 및 기본 정보 수정
-- 커리큘럼 관리 (섹션·강의 CRUD)
-- 강사 대시보드 및 강의 목록
-- 카테고리 조회 API
+자세한 내용은 [기능명세서](./docs/기능명세서.md)를 참조하세요.
 
-### 스키마 정의 (UI 미구현)
-
-- 수강 등록 (`CourseEnrollment`)
-- 강의 리뷰 (`CourseReview`)
-- Q&A 및 댓글 (`CourseQuestion`, `CourseComment`)
-- 학습 진도 (`LectureActivity`)
-
-## API 개요
-
-| 도메인       | 경로 prefix   | 설명           |
-| ------------ | ------------- | -------------- |
-| Health Check | `GET /hc`     | 서버 상태 확인 |
-| Categories   | `/categories` | 카테고리 목록  |
-| Courses      | `/courses`    | 강의 CRUD      |
-| Sections     | `/sections`   | 섹션 CRUD      |
-| Lectures     | `/lectures`   | 강의 CRUD      |
+## API
 
 상세 스펙은 Swagger 문서(http://localhost:8000/docs)를 참고하세요.
 
