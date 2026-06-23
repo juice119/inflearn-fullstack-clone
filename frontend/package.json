@@ -10,6 +10,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,mjs}\"",
     "lint": "eslint . --fix",
     "fix-format": "pnpm format && pnpm lint",
+    "db:gen": "prisma generate",
     "openapi-ts": "openapi-ts"
   },
   "dependencies": {

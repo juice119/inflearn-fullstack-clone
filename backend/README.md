@@ -1,4 +1,19 @@
-# 🧪 NestJS 백엔드 테스트 전략 및 표준 아키텍처 가이드
+# Backend
+
+NestJS API 서버입니다.
+
+## 문서
+
+| 문서 | 설명 |
+| ---- | ---- |
+| [개발환경세팅](../docs/개발환경세팅.md) | 로컬 실행 |
+| [백엔드테스트](../docs/백엔드테스트.md) | 테스트 실행·구조 |
+| [환경변수](../docs/환경변수.md) | YAML 설정 레퍼런스 |
+| [아키텍처](../docs/아키텍처.md) | 인증·DB 흐름 |
+
+---
+
+# 테스트 전략 및 표준 아키텍처 가이드
 
 ## 1. 핵심 아키텍처 요약 (Directory & Naming)
 
@@ -45,7 +60,7 @@
 
 "자신이 만든 강의는 수정할 수 있다"라는 기획을 구현할 때, 중복 없이 테스트 코드를 분배하는 정석 설계 예시입니다.
 
-### 🧪 `test/integration/lecture/lecture.service.spec.ts` (통합 테스트)
+### `test/integration/lecture/lecture.service.spec.ts` (통합 테스트)
 
 비즈니스 로직의 올바름을 검증하기 위해 **모든 경우의 수(Edge Cases)**를 꼼꼼하게 검증합니다.
 
@@ -53,31 +68,29 @@
 - **[실패 케이스]** 다른 사용자가 수정을 시도할 때 `ForbiddenException`이 정상적으로 발생하는가?
 - **[실패 케이스]** 존재하지 않는 강의 ID로 수정을 요청할 때 `NotFoundException`을 반환하는가?
 
-### 🎭 `test/e2e/lecture.spec.ts` (E2E 테스트)
+### `test/e2e/lecture.spec.ts` (E2E 테스트)
 
 네트워크와 인프라, 보안이 잘 통하는지 **성공 경로(Happy Path)와 글로벌 인증 차단**만 검증합니다.
 
-- **[성공 (Happy Path)]** `로그인` ➡️ `토큰 획득` ➡️ `헤더에 토큰 첨부` ➡️ `PATCH /api/lectures/1` 호출 ➡️ `200 OK` 및 정상 데이터 응답 확인
-- **[보안 검증]** 인증 토큰 없이 `PATCH /api/lectures/1` 호출 ➡️ 로직을 타기 전에 글로벌 JWT 가드가 `401 Unauthorized`로 튕겨내는지 확인
+- **[성공 (Happy Path)]** `로그인` → `토큰 획득` → `헤더에 토큰 첨부` → `PATCH /api/lectures/1` 호출 → `200 OK` 및 정상 데이터 응답 확인
+- **[보안 검증]** 인증 토큰 없이 `PATCH /api/lectures/1` 호출 → 로직을 타기 전에 글로벌 JWT 가드가 `401 Unauthorized`로 튕겨내는지 확인
 
 ---
 
-## 4.테스트 코드 구성
+## 4. 테스트 코드 구성
 
 - given, when, then 주석으로 나누기
 - 한글명으로 작성하기
 
 ```typescript
 describe('AppConfig', () => {
-  beforeEach(() => {});
-
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe('ofYml', () => {
     it('yaml파일을 읽어서 직렬화한다.', () => {
-      // gievn
+      // given
       const validConfig = createValdateConfigObject();
       vi.mocked(readFileSync).mockReturnValue('mocked-yaml-content');
       vi.mocked(yaml.load).mockReturnValue(validConfig);
@@ -95,36 +108,4 @@ describe('AppConfig', () => {
 
 ## 5. 테스트 실행 방법
 
-### unit
-
-```sh
-pnpm test:unit
-```
-
-### integration
-
-```sh
-# docker 및 외부 의존성을 위한 스크립트 !부팅후 한번만 실행하기
-pnpm test:int-setup
-
-pnpm test:int
-```
-
-### E2E
-
-Playwright가 테스트 실행 시 Docker DB 구동 → NestJS 서버 기동을 자동으로 수행합니다.
-
-```sh
-# E2E 테스트 (인프라 + 서버 자동 기동)
-pnpm test:e2e
-
-# Playwright UI 모드
-pnpm test:e2e-ui
-```
-
-인프라를 미리 준비해 두고 E2E만 반복 실행하려면:
-
-```sh
-pnpm test:e2e-setup
-SKIP_TEST_INFRA_SETUP=1 pnpm test:e2e
-```
+실행 명령·환경 YAML 설정은 [docs/백엔드테스트.md](../docs/백엔드테스트.md)를 참고하세요.
