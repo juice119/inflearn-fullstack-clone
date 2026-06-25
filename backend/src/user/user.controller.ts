@@ -1,15 +1,28 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { JwtAuth } from 'src/common/decorators/JwtAuth.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { JwtUserPayLoad } from 'src/common/JwtUserPayLoad';
 import { MyProfileResponseDto } from './dto/MyProfileResponse.dto';
+import { SignUpRequestDto } from './dto/SignUpRequest.dto';
+import { SignUpResponseDto } from './dto/SignUpResponse.dto';
 import { UpdateMyProfileRequestDto } from './dto/UpdateMyProfileRequest.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('signup')
+  @ApiOkResponse({ description: '회원가입 성공', type: SignUpResponseDto })
+  async signUp(@Body() signUpRequestDto: SignUpRequestDto): Promise<SignUpResponseDto> {
+    const user = await this.userService.signUp(signUpRequestDto);
+    return new SignUpResponseDto({
+      id: user.id,
+      name: user.name,
+      email: user.email!,
+    });
+  }
 
   @Get('my-profile')
   @JwtAuth()

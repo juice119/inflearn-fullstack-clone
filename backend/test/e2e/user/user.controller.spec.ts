@@ -18,6 +18,56 @@ test.describe('UserController', () => {
     await e2eDbHelper.disconnect();
   });
 
+  test.describe('POST /user/signup', () => {
+    test('회원가입에 성공한다.', async ({ request }) => {
+      // given
+      const signUpData = {
+        email: 'signup@example.com',
+        password: 'abc123',
+        nickname: '홍길동',
+      };
+
+      // when
+      const response = await request.post('/user/signup', {
+        data: signUpData,
+      });
+
+      // then
+      expect(response.ok()).toBeTruthy();
+      expect(await response.json()).toEqual({
+        id: expect.any(String),
+        email: 'signup@example.com',
+        name: '홍길동',
+      });
+    });
+
+    test('필수 필드가 누락되면 400 Bad Request를 반환한다.', async ({ request }) => {
+      // given
+      // when
+      const response = await request.post('/user/signup', {
+        data: {},
+      });
+
+      // then
+      expect(response.status()).toBe(400);
+    });
+
+    test('유효하지 않은 이메일 형식이면 400 Bad Request를 반환한다.', async ({ request }) => {
+      // given
+      // when
+      const response = await request.post('/user/signup', {
+        data: {
+          email: 'invalid-email',
+          password: 'abc123',
+          nickname: '홍길동',
+        },
+      });
+
+      // then
+      expect(response.status()).toBe(400);
+    });
+  });
+
   test.describe('GET /user/my-profile', () => {
     test('인증된 사용자의 프로필을 조회한다.', async ({ request }) => {
       // given
@@ -58,7 +108,7 @@ test.describe('UserController', () => {
     test('인증된 사용자의 프로필을 수정한다.', async ({ request }) => {
       // given
       const user = await e2eDbHelper.createUser({
-        name: '기존 이름',
+        name: '기존닉네임',
         bio: '기존 자기소개',
       });
       const accessToken = await e2eAuthHelper.createAccessToken(user.id, user.email!);
@@ -69,7 +119,7 @@ test.describe('UserController', () => {
           Authorization: `Bearer ${accessToken}`,
         },
         data: {
-          name: '새 이름',
+          name: '새닉네임',
           image: 'https://cdn.example.com/new-profile.jpg',
           bio: '새 자기소개',
         },
@@ -78,7 +128,7 @@ test.describe('UserController', () => {
       // then
       expect(response.ok()).toBeTruthy();
       expect(await response.json()).toEqual({
-        name: '새 이름',
+        name: '새닉네임',
         image: 'https://cdn.example.com/new-profile.jpg',
         bio: '새 자기소개',
       });

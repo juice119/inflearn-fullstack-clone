@@ -11,7 +11,15 @@ export default defineConfig({
 
   test: {
     globals: true,
+    maxWorkers: '90%',
+    isolate: false,
     root: './',
+    // execArgv: [
+    //   '--cpu-prof',
+    //   '--cpu-prof-dir=test-runner-profile',
+    //   '--heap-prof',
+    //   '--heap-prof-dir=test-runner-profile',
+    // ],
     environment: 'node',
     include: ['test/integration/**/*.spec.ts'],
     coverage: {

@@ -10,6 +10,8 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    isolate: false,
+    maxWorkers: 4,
     root: './',
     environment: 'node',
     include: ['test/unit/**/*.spec.ts'],

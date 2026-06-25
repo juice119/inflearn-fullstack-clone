@@ -1,12 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 import { IsOptional, IsString } from 'class-validator';
+import { Trim } from 'src/common/transform/trim';
+import { IsNickname } from 'src/common/validators/IsNickname.validator';
 
 export class UpdateMyProfileRequestDto {
   @ApiProperty({ type: String, description: '사용자 이름', example: '홍길동', required: false })
-  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   @IsOptional()
   @IsString()
+  @IsNickname()
   readonly name?: string;
 
   @ApiProperty({
@@ -15,7 +17,7 @@ export class UpdateMyProfileRequestDto {
     example: 'https://cdn.example.com/profile.jpg',
     required: false,
   })
-  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   @IsOptional()
   @IsString()
   readonly image?: string;
@@ -26,7 +28,7 @@ export class UpdateMyProfileRequestDto {
     example: '안녕하세요. 개발자입니다.',
     required: false,
   })
-  @Transform(({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value))
+  @Trim()
   @IsOptional()
   @IsString()
   readonly bio?: string;

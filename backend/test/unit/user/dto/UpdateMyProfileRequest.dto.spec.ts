@@ -44,6 +44,21 @@ describe('UpdateMyProfileRequestDto', () => {
       expect(errors[0].constraints).toHaveProperty('isString');
     });
 
+    it('닉네임이 2자 미만이면 에러가 발생한다.', () => {
+      // given
+      const dto = toDto({ name: 'a' });
+
+      // when
+      const errors = validateSync(dto);
+
+      // then
+      expect(errors).toHaveLength(1);
+      expect(errors[0].property).toBe('name');
+      expect(Object.values(errors[0].constraints ?? {})).toContain(
+        '닉네임은 2자 이상이어야 합니다.',
+      );
+    });
+
     it('image가 문자열이 아니면 에러가 발생한다.', () => {
       // given
       const dto = toDto({ image: 123 });

@@ -6,16 +6,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 export class AppTestHepler {
   private readonly prismaTestingHelper: PrismaTestingHelper<PrismaService>;
-  private readonly _prismaService: PrismaService;
+  private readonly _originalPrismaService: PrismaService;
+  private readonly _proxyPrismaService: PrismaService;
   private readonly _appConfig: AppConfig;
 
   private constructor(
     prismaTestingHelper: PrismaTestingHelper<PrismaService>,
-    prisma: PrismaService,
+    originalPrisma: PrismaService,
+    proxyPrisma: PrismaService,
     _appConfig: AppConfig,
   ) {
     this.prismaTestingHelper = prismaTestingHelper;
-    this._prismaService = prisma;
+    this._originalPrismaService = originalPrisma;
+    this._proxyPrismaService = proxyPrisma;
     this._appConfig = _appConfig;
   }
 
@@ -24,12 +27,13 @@ export class AppTestHepler {
     await prismaService.$connect();
 
     const prismaTestingHelper = new PrismaTestingHelper(prismaService);
+    const proxyPrismaService = prismaTestingHelper.getProxyClient();
 
-    return new AppTestHepler(prismaTestingHelper, prismaService, appConfig);
+    return new AppTestHepler(prismaTestingHelper, prismaService, proxyPrismaService, appConfig);
   }
 
   async cleanData() {
-    const tableNames: string[] = await this._prismaService.$queryRaw`
+    const tableNames: string[] = await this._originalPrismaService.$queryRaw`
     SELECT table_name 
     FROM information_schema.tables 
     WHERE table_schema = 'public' 
@@ -39,7 +43,7 @@ export class AppTestHepler {
 
     // 2. 외래키 제약조건을 잠시 끄고 모든 테이블을 TRUNCATE 합니다.
     for (const tableName of tableNames) {
-      await this._prismaService.$executeRawUnsafe(
+      await this._originalPrismaService.$executeRawUnsafe(
         `TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE;`,
       );
     }
@@ -66,10 +70,10 @@ export class AppTestHepler {
   }
 
   async disconnetDBConnection() {
-    await this._prismaService.$disconnect();
+    await this._originalPrismaService.$disconnect();
   }
 
   get prismaService(): PrismaService {
-    return this._prismaService;
+    return this._proxyPrismaService;
   }
 }
