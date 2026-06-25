@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AppControllerHcData, AppControllerHcResponses, CategoriesControllerFindAllData, CategoriesControllerFindAllResponses, CoursesControllerCreateData, CoursesControllerCreateResponses, CoursesControllerFindAllData, CoursesControllerFindAllResponses, CoursesControllerFindOneData, CoursesControllerFindOneResponses, CoursesControllerUpdateData, CoursesControllerUpdateResponses, LecturesControllerCreateData, LecturesControllerCreateResponses, LecturesControllerDeleteData, LecturesControllerDeleteResponses, LecturesControllerFindOneData, LecturesControllerFindOneResponses, LecturesControllerUpdateData, LecturesControllerUpdateResponses, MediaControllerUploadData, MediaControllerUploadResponses, SectionsControllerCreateData, SectionsControllerCreateResponses, SectionsControllerDeleteData, SectionsControllerDeleteResponses, SectionsControllerFindOneData, SectionsControllerFindOneResponses, SectionsControllerUpdateData, SectionsControllerUpdateResponses } from './types.gen';
+import type { AppControllerHcData, AppControllerHcResponses, CategoriesControllerFindAllData, CategoriesControllerFindAllResponses, CoursesControllerCreateData, CoursesControllerCreateResponses, CoursesControllerFindAllData, CoursesControllerFindAllResponses, CoursesControllerFindOneData, CoursesControllerFindOneResponses, CoursesControllerUpdateData, CoursesControllerUpdateResponses, LecturesControllerCreateData, LecturesControllerCreateResponses, LecturesControllerDeleteData, LecturesControllerDeleteResponses, LecturesControllerFindOneData, LecturesControllerFindOneResponses, LecturesControllerUpdateData, LecturesControllerUpdateResponses, MediaControllerUploadData, MediaControllerUploadResponses, SectionsControllerCreateData, SectionsControllerCreateResponses, SectionsControllerDeleteData, SectionsControllerDeleteResponses, SectionsControllerFindOneData, SectionsControllerFindOneResponses, SectionsControllerUpdateData, SectionsControllerUpdateResponses, UserControllerGetMyProfileData, UserControllerGetMyProfileResponses, UserControllerSignUpData, UserControllerSignUpResponses, UserControllerUpdateMyProfileData, UserControllerUpdateMyProfileResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -109,6 +109,31 @@ export const mediaControllerUpload = <ThrowOnError extends boolean = false>(opti
     ...options,
     headers: {
         'Content-Type': null,
+        ...options.headers
+    }
+});
+
+export const userControllerSignUp = <ThrowOnError extends boolean = false>(options: Options<UserControllerSignUpData, ThrowOnError>): RequestResult<UserControllerSignUpResponses, unknown, ThrowOnError> => (options.client ?? client).post<UserControllerSignUpResponses, unknown, ThrowOnError>({
+    url: '/user/signup',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const userControllerGetMyProfile = <ThrowOnError extends boolean = false>(options?: Options<UserControllerGetMyProfileData, ThrowOnError>): RequestResult<UserControllerGetMyProfileResponses, unknown, ThrowOnError> => (options?.client ?? client).get<UserControllerGetMyProfileResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/user/my-profile',
+    ...options
+});
+
+export const userControllerUpdateMyProfile = <ThrowOnError extends boolean = false>(options: Options<UserControllerUpdateMyProfileData, ThrowOnError>): RequestResult<UserControllerUpdateMyProfileResponses, unknown, ThrowOnError> => (options.client ?? client).patch<UserControllerUpdateMyProfileResponses, unknown, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/user/my-profile',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
         ...options.headers
     }
 });

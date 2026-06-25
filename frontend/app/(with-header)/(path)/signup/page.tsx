@@ -1,13 +1,18 @@
 'use client';
 
-import { signUp } from '@/app/actions/auth-actions';
+import { signUp } from '@/lib/api';
 import Link from 'next/link';
 import { useState, type SubmitEvent } from 'react';
+
+const MAX_NICKNAME_LENGTH = 8;
+const MAX_EMAIL_LENGTH = 30;
+const MAX_PASSWORD_LENGTH = 16;
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [nickname, setNickname] = useState('');
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -17,15 +22,12 @@ export default function SignupPage() {
       return;
     }
 
-    const result = await signUp({ email, password });
+    const result = await signUp({ email, password, nickname });
 
-    if (result?.status != 'ok') {
-      alert(result?.message || '회원 가입 실패');
+    if (result.error?.isError) {
+      alert(result.error.message || '회원 가입 실패');
       return;
     }
-
-    alert(`이메일 "${email}" 로 회원가입에 성공하였습니다.`);
-    return;
   };
 
   return (
@@ -40,6 +42,17 @@ export default function SignupPage() {
           onChange={(e) => setEmail(e.target.value)}
           type="email"
           name="email"
+          maxLength={MAX_EMAIL_LENGTH}
+          placeholder="example@inflab.com"
+          className="border-2 border-gray-300 rounded-sm p-2"
+        />
+        <label htmlFor="nickname">닉네임</label>
+        <input
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          type="text"
+          name="nickname"
+          maxLength={MAX_NICKNAME_LENGTH}
           placeholder="example@inflab.com"
           className="border-2 border-gray-300 rounded-sm p-2"
         />
@@ -49,6 +62,7 @@ export default function SignupPage() {
           onChange={(e) => setPassword(e.target.value)}
           type="password"
           name="password"
+          maxLength={MAX_PASSWORD_LENGTH}
           placeholder="example@inflab.com"
           className="border-2 border-gray-300 rounded-sm p-2"
         />
@@ -58,6 +72,7 @@ export default function SignupPage() {
           onChange={(e) => setPasswordConfirm(e.target.value)}
           type="password"
           name="passwordConfirm"
+          maxLength={MAX_PASSWORD_LENGTH}
           placeholder="example@inflab.com"
           className="border-2 border-gray-300 rounded-sm p-2"
         />

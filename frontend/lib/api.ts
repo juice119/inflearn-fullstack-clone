@@ -14,9 +14,11 @@ import {
   sectionsControllerCreate,
   sectionsControllerDelete,
   sectionsControllerUpdate,
+  SignUpRequestDto,
   UpdateCourseDto,
   UpdateLectureDto,
   UpdateSectionDto,
+  userControllerSignUp,
 } from '@/generated/openapi.ts';
 
 function serializeApiResponse<T>({ data, error }: { data: T | undefined; error: unknown }): {
@@ -151,6 +153,13 @@ export async function updateLecture(lectureId: string, data: UpdateLectureDto) {
       id: lectureId,
     },
     body: data,
+  });
+  return serializeApiResponse(response);
+}
+
+export async function signUp(requestDto: SignUpRequestDto) {
+  const response = await userControllerSignUp({
+    body: requestDto,
   });
   return serializeApiResponse(response);
 }

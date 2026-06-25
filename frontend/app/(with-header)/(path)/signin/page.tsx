@@ -1,9 +1,7 @@
 'use client';
 
-import { handleCredentialsSignin } from '@/app/actions/handleCredentialsSignin';
 import Link from 'next/link';
-import { type SubmitEvent } from 'react';
-import { useState } from 'react';
+import { useState, type SubmitEvent } from 'react';
 
 export default function SigninPage() {
   const [email, setEmail] = useState('');
@@ -12,9 +10,7 @@ export default function SigninPage() {
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const result = await handleCredentialsSignin(email, password);
-
-    if (!result.success) alert(result.errorMessage);
+    // TODO: 로그인 로직 연결
   };
 
   return (

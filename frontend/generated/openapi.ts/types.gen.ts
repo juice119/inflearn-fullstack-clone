@@ -337,6 +337,66 @@ export type MediaUploadResponseDto = {
     fileUrl: string;
 };
 
+export type SignUpRequestDto = {
+    /**
+     * 이메일
+     */
+    email: string;
+    /**
+     * 비밀번호
+     */
+    password: string;
+    /**
+     * 닉네임
+     */
+    nickname: string;
+};
+
+export type SignUpResponseDto = {
+    /**
+     * 사용자 ID
+     */
+    id: string;
+    /**
+     * 이메일
+     */
+    email: string;
+    /**
+     * 닉네임
+     */
+    name?: string | null;
+};
+
+export type MyProfileResponseDto = {
+    /**
+     * 사용자 이름
+     */
+    name?: string | null;
+    /**
+     * 프로필 이미지 URL
+     */
+    image?: string | null;
+    /**
+     * 자기소개
+     */
+    bio?: string | null;
+};
+
+export type UpdateMyProfileRequestDto = {
+    /**
+     * 사용자 이름
+     */
+    name?: string;
+    /**
+     * 프로필 이미지 URL
+     */
+    image?: string;
+    /**
+     * 자기소개
+     */
+    bio?: string;
+};
+
 export type AppControllerHcData = {
     body?: never;
     path?: never;
@@ -606,3 +666,51 @@ export type MediaControllerUploadResponses = {
 };
 
 export type MediaControllerUploadResponse = MediaControllerUploadResponses[keyof MediaControllerUploadResponses];
+
+export type UserControllerSignUpData = {
+    body: SignUpRequestDto;
+    path?: never;
+    query?: never;
+    url: '/user/signup';
+};
+
+export type UserControllerSignUpResponses = {
+    /**
+     * 회원가입 성공
+     */
+    200: SignUpResponseDto;
+};
+
+export type UserControllerSignUpResponse = UserControllerSignUpResponses[keyof UserControllerSignUpResponses];
+
+export type UserControllerGetMyProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/user/my-profile';
+};
+
+export type UserControllerGetMyProfileResponses = {
+    /**
+     * 내 프로필 조회 성공
+     */
+    200: MyProfileResponseDto;
+};
+
+export type UserControllerGetMyProfileResponse = UserControllerGetMyProfileResponses[keyof UserControllerGetMyProfileResponses];
+
+export type UserControllerUpdateMyProfileData = {
+    body: UpdateMyProfileRequestDto;
+    path?: never;
+    query?: never;
+    url: '/user/my-profile';
+};
+
+export type UserControllerUpdateMyProfileResponses = {
+    /**
+     * 내 프로필 수정 성공
+     */
+    200: MyProfileResponseDto;
+};
+
+export type UserControllerUpdateMyProfileResponse = UserControllerUpdateMyProfileResponses[keyof UserControllerUpdateMyProfileResponses];
